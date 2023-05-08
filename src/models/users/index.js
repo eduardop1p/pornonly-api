@@ -29,7 +29,7 @@ module.exports = class Users {
       }
 
       return this.user;
-    } catch {
+    } catch (err) {
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',
@@ -38,6 +38,8 @@ module.exports = class Users {
   }
 
   async storeUser() {
+    this.clearUpDataUser();
+
     await this.userExist();
     if (this.errors.length) return;
 
@@ -53,6 +55,76 @@ module.exports = class Users {
       }
 
       return this.user;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async showUser(userId) {
+    try {
+      this.user = await UsersModel.findById(userId).select(['id', 'name', 'email', 'createIn']);
+
+      if (!this.user) {
+        this.errors.push({
+          code: 500,
+          msg: 'Usuário não existe na base de dados.',
+        });
+        return;
+      }
+
+      return this.user;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async updateUser(userId) {
+    this.clearUpDataUser();
+
+    try {
+      this.user = await UsersModel.findByIdAndUpdate(userId, this.body, { new: true }).select([
+        'id',
+        'name',
+        'email',
+        'createIn',
+      ]);
+
+      if (!this.user) {
+        this.errors.push({
+          code: 500,
+          msg: 'Usuário não existe na base de dados.',
+        });
+        return;
+      }
+
+      return this.user;
+    } catch (err) {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async deleteUser(userId) {
+    try {
+      this.user = await UsersModel.findByIdAndDelete(userId);
+
+      if (!this.user) {
+        this.errors.push({
+          code: 500,
+          msg: 'Usuário não encontrado na base de dados.',
+        });
+        return;
+      }
+
+      return;
     } catch {
       this.errors.push({
         code: 500,
@@ -82,6 +154,14 @@ module.exports = class Users {
         msg: 'Erro interno no servidor.',
       });
     }
+  }
+
+  clearUpDataUser() {
+    this.body = {
+      name: this.body.name ? this.body.name : undefined,
+      email: this.body.email ? this.body.email : undefined,
+      password: this.body.password ? this.body.password : undefined,
+    };
   }
 };
 

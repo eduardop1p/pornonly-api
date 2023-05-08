@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 const homeRouter = require('./routes/home');
 const usersRouter = require('./routes/users');
+const loginRouter = require('./routes/login');
 
 class App {
   constructor() {
@@ -34,6 +35,7 @@ class App {
   routes() {
     this.app.use('/', homeRouter);
     this.app.use('/users', usersRouter);
+    this.app.use('/login', loginRouter);
     this.app.use((req, res) => res.status(404).json({ status: 404 }));
   }
 
