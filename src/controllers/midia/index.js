@@ -1,4 +1,5 @@
 const multer = require('multer');
+const { resolve } = require('path');
 
 const multerConfig = require('../../config/multer');
 

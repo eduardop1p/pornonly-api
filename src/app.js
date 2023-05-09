@@ -30,7 +30,8 @@ class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cors(this.corsOptions()));
-    this.app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
+    this.app.use('/midia/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
+    // this.app.use(express.static('uploads'));
   }
 
   routes() {
