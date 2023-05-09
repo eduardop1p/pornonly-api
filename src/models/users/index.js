@@ -1,8 +1,9 @@
-const { Schema, model, Error } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const usersSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  midia: [{ type: Types.ObjectId, require: false, ref: 'Midia' }],
   password: { type: String, required: true },
   createIn: { type: Date, default: Date.now },
 });
@@ -65,7 +66,13 @@ module.exports = class Users {
 
   async showUser(userId) {
     try {
-      this.user = await UsersModel.findById(userId).select(['id', 'name', 'email', 'createIn']);
+      this.user = await UsersModel.findById(userId).select([
+        'id',
+        'name',
+        'email',
+        'midia',
+        'createIn',
+      ]);
 
       if (!this.user) {
         this.errors.push({
@@ -92,6 +99,7 @@ module.exports = class Users {
         'id',
         'name',
         'email',
+        'midia',
         'createIn',
       ]);
 

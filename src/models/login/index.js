@@ -11,7 +11,12 @@ module.exports = class Login {
 
   async userLogin() {
     try {
-      this.user = await UsersModel.findOne({ ...this.body }).select(['id', 'name', 'email']);
+      this.user = await UsersModel.findOne({ ...this.body }).select([
+        'id',
+        'name',
+        'midia',
+        'email',
+      ]);
 
       if (!this.user) {
         this.errors.push({
