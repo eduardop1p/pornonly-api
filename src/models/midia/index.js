@@ -1,11 +1,12 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 const { UsersModel } = require('../users');
 
 const MidiaSchema = new Schema({
   title: { type: String, required: false, default: 'Nenhum titulo aqui.' },
-  descripton: { type: String, default: 'Nenhum descrição para este titulo.' },
+  description: { type: String, default: 'Nenhum descrição para este titulo.' },
   tags: { type: Array },
+  userId: [{ type: Types.ObjectId, ref: 'Users' }],
   path: { type: String, require: true },
   url: { type: String, require: true },
   createIn: { type: Date, default: Date.now },
@@ -21,8 +22,37 @@ module.exports = class Midia {
     this.errors = [];
   }
 
-  async storeMidia(userId) {
-    this.userExist(userId);
+  async getAllMidiaUsers() {
+    try {
+      this.midia = await MidiaModel.find({}, null, { sort: { createIn: -1 } })
+        .select(['_id', 'title', 'description', 'tags', 'userId', 'url', 'createIn'])
+        .sort({ createIn: -1 })
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name', 'email'],
+        });
+
+      if (!this.midia) {
+        this.errors.push({
+          code: 400,
+          msg: 'Erro ao pegar dados.',
+        });
+        return;
+      }
+
+      return this.midia;
+    } catch (err) {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async storeMidia() {
+    const { userId } = this.body;
+
+    await this.userExist(userId);
     if (this.errors.length) return;
 
     try {
@@ -38,9 +68,10 @@ module.exports = class Midia {
 
       this.user.midia.push(this.midia._id);
 
-      return this.midia;
+      await this.user.save();
+
+      return;
     } catch (err) {
-      console.log(err);
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',
@@ -59,7 +90,8 @@ module.exports = class Midia {
         });
         return;
       }
-      return;
+
+      return this.user;
     } catch {
       this.errors.push({
         code: 500,

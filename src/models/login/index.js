@@ -12,7 +12,7 @@ module.exports = class Login {
   async userLogin() {
     try {
       this.user = await UsersModel.findOne({ ...this.body }).select([
-        'id',
+        '_id',
         'name',
         'midia',
         'email',

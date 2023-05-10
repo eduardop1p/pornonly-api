@@ -17,6 +17,11 @@ class MidiaController {
 
       const { userId } = req;
 
+      if (!userId || typeof userId !== 'string') {
+        res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+        return;
+      }
+
       const { mimetype, filename } = req.file;
 
       const { title, description } = req.body;
@@ -30,21 +35,44 @@ class MidiaController {
         title,
         description,
         tags,
+        userId,
         path,
         url,
       };
 
       const midia = new Midia(body);
 
-      const midiaInfo = await midia.storeMidia(userId);
+      await midia.storeMidia();
 
       if (midia.errors.length) {
         res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
         return;
       }
 
-      res.json(midiaInfo);
+      res.json({
+        success: 'Publicação adcionada.',
+      });
     });
+  }
+
+  async index(req, res) {
+    const { apiKey } = req.params;
+
+    if (apiKey !== process.env.API_KEY) {
+      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaUsers();
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midiaUsers: midiaInfo });
   }
 
   async delete(req, res) {

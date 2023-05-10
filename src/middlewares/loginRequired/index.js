@@ -13,9 +13,9 @@ module.exports = async function (req, res, next) {
   try {
     const data = jwt.verify(token, process.env.TOKEN_SECRET);
 
-    const { id, email } = data;
+    const { _id, email } = data;
 
-    req.userId = id;
+    req.userId = _id;
     req.email = email;
 
     next();

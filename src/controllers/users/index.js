@@ -65,15 +65,9 @@ class UsersController {
       return;
     }
 
-    const { id, name, email, midia, createIn } = userInfo;
+    // const { _id, name, email, midia, createIn } = userInfo;
 
-    res.json({
-      id,
-      name,
-      email,
-      midia,
-      createIn,
-    });
+    res.json(userInfo);
   }
 
   async update(req, res) {
@@ -110,13 +104,7 @@ class UsersController {
       return;
     }
 
-    res.json({
-      id: userInfo.id,
-      name: userInfo.name,
-      email: userInfo.email,
-      midia: userInfo.midia,
-      createIn: userInfo.createIn,
-    });
+    res.json(userInfo);
   }
 
   async delete(req, res) {

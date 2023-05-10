@@ -66,13 +66,13 @@ module.exports = class Users {
 
   async showUser(userId) {
     try {
-      this.user = await UsersModel.findById(userId).select([
-        'id',
-        'name',
-        'email',
-        'midia',
-        'createIn',
-      ]);
+      this.user = await UsersModel.findById(userId)
+        .select(['_id', 'name', 'email', 'midia', 'createIn'])
+        .populate({
+          path: 'midia',
+          select: ['_id', 'title', 'description', 'tags', 'url', 'createIn'],
+          options: { sort: { createIn: -1 } },
+        });
 
       if (!this.user) {
         this.errors.push({
@@ -96,7 +96,7 @@ module.exports = class Users {
 
     try {
       this.user = await UsersModel.findByIdAndUpdate(userId, this.body, { new: true }).select([
-        'id',
+        '_id',
         'name',
         'email',
         'midia',
