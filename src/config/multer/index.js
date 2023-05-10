@@ -1,20 +1,14 @@
 const multer = require('multer');
 const { extname, resolve } = require('path');
 
+const midiaMimetypes = require('../../services/midiaMimetypes');
+const { imgsMimetypes } = require('../../services/midiaMimetypes');
+
 const random = () => Math.floor(Math.random() * 10000 + 10000);
-const fileMimetypes = [
-  'image/png',
-  'image/jpeg',
-  'image/gif',
-  'video/mp4',
-  'video/quicktime',
-  'video/webm',
-  'video/x-m4v',
-];
 
 module.exports = {
   fileFilter: (req, file, cb) => {
-    if (fileMimetypes.indexOf(file.mimetype) == -1) {
+    if (midiaMimetypes.indexOf(file.mimetype) == -1) {
       return cb(new multer.MulterError('Formato de arquivo inválido.'));
     }
     return cb(null, true);
@@ -23,9 +17,7 @@ module.exports = {
     destination: (req, file, cb) => {
       cb(
         null,
-        file.mimetype == 'image/png' ||
-          file.mimetype == 'image/jpeg' ||
-          file.mimetype == 'image/gif'
+        imgsMimetypes.indexOf(file.mimetype) !== -1
           ? resolve(__dirname, '..', '..', '..', 'uploads', 'imgs')
           : resolve(__dirname, '..', '..', '..', 'uploads', 'videos')
       );
