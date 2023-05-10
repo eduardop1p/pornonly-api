@@ -59,6 +59,7 @@ class MidiaController {
 
   async index(req, res) {
     const { apiKey } = req.params;
+    const page = req.query.page || 1;
 
     if (apiKey !== process.env.API_KEY) {
       res.status(401).json({ error: 'Acesso permitido somente para adms.' });
@@ -67,7 +68,7 @@ class MidiaController {
 
     const midia = new Midia();
 
-    const midiaInfo = await midia.getAllMidiaUsers();
+    const midiaInfo = await midia.getAllMidiaUsers(page);
 
     if (midia.errors.length) {
       res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });

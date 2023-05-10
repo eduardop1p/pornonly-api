@@ -44,7 +44,10 @@ class App {
 
   async connectMongo() {
     try {
-      await mongoose.connect(process.env.CONNECT_MONGO_STRING, { dbName: 'pornonlycloud' });
+      await mongoose.connect(process.env.CONNECT_MONGO_STRING, {
+        dbName: 'pornonlycloud',
+        socketTimeoutMS: 60000,
+      });
     } catch (err) {
       console.error('Erro ao conectar-se na base de dados.');
     }

@@ -25,23 +25,38 @@ module.exports = class Midia {
     this.errors = [];
   }
 
-  async getAllMidiaUsers() {
+  async getAllMidiaUsers(page) {
+    const pageSize = 2;
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+
     try {
-      this.midia = await MidiaModel.find({}, null, { sort: { createIn: -1 } })
+      const total = await MidiaModel.countDocuments();
+
+      const results = await MidiaModel.find({}, null, { sort: { createIn: -1 } })
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .sort({ createIn: -1 })
+        .skip(startIndex)
+        .limit(pageSize)
         .populate({
           path: 'userId',
           select: ['_id', 'name', 'email'],
         });
 
-      if (!this.midia) {
+      if (!results) {
         this.errors.push({
           code: 400,
           msg: 'Erro ao pegar dados.',
         });
         return;
       }
+
+      this.midia = {
+        results,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(total / pageSize),
+        totalResults: total,
+      };
 
       return this.midia;
     } catch (err) {
