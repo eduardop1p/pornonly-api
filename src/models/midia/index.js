@@ -26,7 +26,7 @@ module.exports = class Midia {
   }
 
   async getAllMidiaUsers(page) {
-    const pageSize = 2;
+    const pageSize = 30;
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
 
