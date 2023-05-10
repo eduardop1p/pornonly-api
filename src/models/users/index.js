@@ -70,7 +70,7 @@ module.exports = class Users {
         .select(['_id', 'name', 'email', 'midia', 'createIn'])
         .populate({
           path: 'midia',
-          select: ['_id', 'title', 'description', 'tags', 'url', 'createIn'],
+          select: ['_id', 'title', 'midiaType', 'description', 'tags', 'url', 'createIn'],
           options: { sort: { createIn: -1 } },
         });
 

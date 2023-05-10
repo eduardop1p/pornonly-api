@@ -25,6 +25,7 @@ class MidiaController {
       const { mimetype, filename } = req.file;
 
       const { title, description } = req.body;
+      const midiaType = imgsMimetypes.indexOf(mimetype) !== -1 ? 'img' : 'video';
       const tags = req.body.tags.split(' ');
       const path = resolve(req.file.path);
       const url = `${process.env.URL}/midia/uploads/${
@@ -34,6 +35,7 @@ class MidiaController {
       const body = {
         title,
         description,
+        midiaType,
         tags,
         userId,
         path,
@@ -50,7 +52,7 @@ class MidiaController {
       }
 
       res.json({
-        success: 'Publicação adcionada.',
+        success: 'Você adcionou uma nova publicação.',
       });
     });
   }
@@ -75,9 +77,47 @@ class MidiaController {
     res.json({ midiaUsers: midiaInfo });
   }
 
-  async delete(req, res) {
+  async deleteOne(req, res) {
+    const { midiaId } = req.params;
+
+    if (!midiaId || typeof midiaId !== 'string') {
+      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    await midia.deleteOneMidia(midiaId);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
     res.json({
-      success: 'delete',
+      success: 'Publicação deletada com sucesso.',
+    });
+  }
+
+  async deleteAll(req, res) {
+    const { userId } = req;
+
+    if (!userId || typeof userId !== 'string') {
+      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    await midia.deleteAllMidia(userId);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({
+      success: 'Todas as publicação foram deletadas com sucesso.',
     });
   }
 }

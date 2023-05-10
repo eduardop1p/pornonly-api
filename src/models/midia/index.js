@@ -1,10 +1,13 @@
 const { Schema, model, Types } = require('mongoose');
+const { rm } = require('fs/promises');
+const { resolve } = require('path');
 
 const { UsersModel } = require('../users');
 
 const MidiaSchema = new Schema({
   title: { type: String, required: false, default: 'Nenhum titulo aqui.' },
   description: { type: String, default: 'Nenhum descrição para este titulo.' },
+  midiaType: { type: String, require: true },
   tags: { type: Array },
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
   path: { type: String, require: true },
@@ -25,7 +28,7 @@ module.exports = class Midia {
   async getAllMidiaUsers() {
     try {
       this.midia = await MidiaModel.find({}, null, { sort: { createIn: -1 } })
-        .select(['_id', 'title', 'description', 'tags', 'userId', 'url', 'createIn'])
+        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .sort({ createIn: -1 })
         .populate({
           path: 'userId',
@@ -72,6 +75,70 @@ module.exports = class Midia {
 
       return;
     } catch (err) {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async deleteOneMidia(midiaId) {
+    try {
+      this.midia = await MidiaModel.findByIdAndDelete(midiaId).select(['_id', 'path']);
+
+      if (!this.midia) {
+        this.errors.push({
+          code: 400,
+          msg: 'Publicação não existe na base de dados.',
+        });
+        return;
+      }
+
+      try {
+        await rm(resolve(this.midia.path));
+      } catch {
+        this.errors.push({
+          code: 500,
+          msg: 'Erro interno no servidor, tente deletar a publicação novalmente.',
+        });
+      }
+
+      return;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async deleteAllMidia(userId) {
+    try {
+      this.midia = await MidiaModel.find({ userId }).select(['_id', 'path']);
+
+      if (!this.midia.length) {
+        this.errors.push({
+          code: 400,
+          msg: 'Publicações não existem na base de dados.',
+        });
+        return;
+      }
+
+      await MidiaModel.deleteMany({ userId });
+
+      try {
+        this.midia.forEach(async midia => {
+          await rm(resolve(midia.path));
+        });
+      } catch {
+        this.errors.push({
+          code: 500,
+          msg: 'Erro interno no servidor, tente deletar as publicações novalmente.',
+        });
+      }
+
+      return;
+    } catch {
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',
