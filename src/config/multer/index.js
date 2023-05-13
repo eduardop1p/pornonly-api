@@ -15,7 +15,7 @@ const destinationPath = file => {
 };
 
 module.exports = {
-  limits: { fileSize: 500000000 },
+  limits: { fileSize: 550000000 },
   fileFilter: (req, file, cb) => {
     if (midiaMimetypes.indexOf(file.mimetype) == -1) {
       return cb(new multer.MulterError('Formato de arquivo inválido.'));
