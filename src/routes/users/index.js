@@ -9,6 +9,6 @@ router.post('/', usersController.store);
 router.get('/', loginRequired, usersController.show);
 router.put('/', loginRequired, usersController.update);
 router.delete('/', loginRequired, usersController.delete);
-// router.get('/', loginRequired, usersController.index);
+// router.get('/all', loginRequired, usersController.index);
 
 module.exports = router;

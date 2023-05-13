@@ -2,9 +2,17 @@ const multer = require('multer');
 const { extname, resolve } = require('path');
 
 const midiaMimetypes = require('../../services/midiaMimetypes');
-const { imgsMimetypes } = require('../../services/midiaMimetypes');
+const { imgsMimetypes, gifsMimetypes } = require('../../services/midiaMimetypes');
 
 const random = () => Math.floor(Math.random() * 10000 + 10000);
+
+const destinationPath = file => {
+  if (imgsMimetypes.indexOf(file.mimetype) !== -1)
+    return resolve(__dirname, '..', '..', '..', 'uploads', 'imgs');
+  if (gifsMimetypes.indexOf(file.mimetype) !== -1)
+    return resolve(__dirname, '..', '..', '..', 'uploads', 'gifs');
+  return resolve(__dirname, '..', '..', '..', 'uploads', 'videos');
+};
 
 module.exports = {
   fileFilter: (req, file, cb) => {
@@ -15,12 +23,7 @@ module.exports = {
   },
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(
-        null,
-        imgsMimetypes.indexOf(file.mimetype) !== -1
-          ? resolve(__dirname, '..', '..', '..', 'uploads', 'imgs')
-          : resolve(__dirname, '..', '..', '..', 'uploads', 'videos')
-      );
+      cb(null, destinationPath(file));
     },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}_${random()}${extname(file.originalname)}`);

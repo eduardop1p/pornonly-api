@@ -3,7 +3,7 @@ const { resolve } = require('path');
 
 const Midia = require('../../models/midia');
 const multerConfig = require('../../config/multer');
-const { imgsMimetypes } = require('../../services/midiaMimetypes');
+const { imgsMimetypes, gifsMimetypes } = require('../../services/midiaMimetypes');
 
 const upload = multer(multerConfig).single('midia');
 
@@ -24,13 +24,17 @@ class MidiaController {
 
       const { mimetype, filename } = req.file;
 
+      const midiaTypes = () => {
+        if (imgsMimetypes.indexOf(mimetype) != -1) return 'imgs';
+        if (gifsMimetypes.indexOf(mimetype) != -1) return 'gifs';
+        return 'videos';
+      };
+
       const { title, description } = req.body;
-      const midiaType = imgsMimetypes.indexOf(mimetype) !== -1 ? 'img' : 'video';
+      const midiaType = midiaTypes().slice(0, -1);
       const tags = req.body.tags.split(' ');
       const path = resolve(req.file.path);
-      const url = `${process.env.URL}/midia/uploads/${
-        imgsMimetypes.indexOf(mimetype) !== -1 ? 'imgs' : 'videos'
-      }/${filename}`;
+      const url = `${process.env.URL}/midia/uploads/${midiaTypes()}/${filename}`;
 
       const body = {
         title,

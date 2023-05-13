@@ -26,18 +26,18 @@ module.exports = class Midia {
   }
 
   async getAllMidiaUsers(page) {
-    const pageSize = 30;
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = page * pageSize;
+    const pageLimit = 30;
+    const startIndex = (page - 1) * pageLimit;
+    const endIndex = page * pageLimit;
 
     try {
       const total = await MidiaModel.countDocuments();
 
-      const results = await MidiaModel.find({}, null, { sort: { createIn: -1 } })
+      const results = await MidiaModel.find() // tras os resultados em ordem crescente com sort 1
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
-        .sort({ createIn: -1 })
-        .skip(startIndex)
-        .limit(pageSize)
+        .sort({ createIn: 1 })
+        .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
+        .limit(pageLimit)
         .populate({
           path: 'userId',
           select: ['_id', 'name', 'email'],
@@ -54,7 +54,7 @@ module.exports = class Midia {
       this.midia = {
         results,
         currentPage: parseInt(page),
-        totalPages: Math.ceil(total / pageSize),
+        totalPages: Math.ceil(total / pageLimit),
         totalResults: total,
       };
 
@@ -99,7 +99,15 @@ module.exports = class Midia {
 
   async deleteOneMidia(midiaId) {
     try {
-      this.midia = await MidiaModel.findByIdAndDelete(midiaId).select(['_id', 'path']);
+      this.midia = await MidiaModel.findByIdAndDelete(midiaId).select(['_id', 'path', 'userId']);
+
+      const userId = this.midia.userId[0];
+
+      this.user = await UsersModel.findById(userId);
+      this.user.midia = this.user.midia.filter(
+        id => id.toHexString() != this.midia._id.toHexString()
+      );
+      this.user.save();
 
       if (!this.midia) {
         this.errors.push({
@@ -140,6 +148,10 @@ module.exports = class Midia {
       }
 
       await MidiaModel.deleteMany({ userId });
+
+      this.user = await UsersModel.findById(userId);
+      this.user.midia = [];
+      this.user.save();
 
       try {
         this.midia.forEach(async midia => {

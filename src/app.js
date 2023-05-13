@@ -49,6 +49,7 @@ class App {
         socketTimeoutMS: 60000,
       });
     } catch (err) {
+      // console.error(err);
       console.error('Erro ao conectar-se na base de dados.');
     }
   }
