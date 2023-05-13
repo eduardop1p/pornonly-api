@@ -9,6 +9,7 @@ const homeRouter = require('./routes/home');
 const usersRouter = require('./routes/users');
 const loginRouter = require('./routes/login');
 const midiaRouter = require('./routes/midia');
+const commentsRouter = require('./routes/comments');
 
 class App {
   constructor() {
@@ -39,6 +40,7 @@ class App {
     this.app.use('/users', usersRouter);
     this.app.use('/login', loginRouter);
     this.app.use('/midia', midiaRouter);
+    this.app.use('/comments', commentsRouter);
     this.app.use((req, res) => res.status(404).json({ status: 404 }));
   }
 

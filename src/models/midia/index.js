@@ -34,7 +34,7 @@ module.exports = class Midia {
       const total = await MidiaModel.countDocuments();
 
       const results = await MidiaModel.find() // tras os resultados em ordem crescente com sort 1
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .select(['_id', 'title', 'description', 'userId', 'url', 'createIn'])
         .sort({ createIn: 1 })
         .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
         .limit(pageLimit)
@@ -53,13 +53,39 @@ module.exports = class Midia {
 
       this.midia = {
         results,
-        currentPage: parseInt(page),
+        currentPage: page,
         totalPages: Math.ceil(total / pageLimit),
         totalResults: total,
       };
 
       return this.midia;
     } catch (err) {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async showMidia(midiaId) {
+    try {
+      this.midia = await MidiaModel.findById(midiaId)
+        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name'],
+        });
+
+      if (!this.midia) {
+        this.errors.push({
+          code: 400,
+          msg: 'Midia não existe na base de dados',
+        });
+        return;
+      }
+
+      return this.midia;
+    } catch {
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',
@@ -194,3 +220,5 @@ module.exports = class Midia {
     }
   }
 };
+
+module.exports.MidiaModel = MidiaModel;
