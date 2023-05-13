@@ -2,7 +2,7 @@ const multer = require('multer');
 const { resolve } = require('path');
 
 const Midia = require('../../models/midia');
-const multerConfig = require('../../config/multer');
+const multerConfig = require('../../config/multerMidia');
 const { imgsMimetypes, gifsMimetypes } = require('../../services/midiaMimetypes');
 
 const upload = multer(multerConfig).single('midia');
@@ -10,8 +10,10 @@ const upload = multer(multerConfig).single('midia');
 class MidiaController {
   async store(req, res) {
     return upload(req, res, async err => {
-      if (!req.file) {
-        res.status(400).json({ error: 'Tamanho de arquivo muito grande.' });
+      if (err) {
+        res.status(400).json({
+          error: err.code == 'LIMIT_FILE_SIZE' ? 'Tamanho de arquivo não suportado.' : err.code,
+        });
         return;
       }
 
@@ -20,11 +22,6 @@ class MidiaController {
 
       if (!userId || typeof userId !== 'string') {
         res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
-        return;
-      }
-
-      if (err) {
-        res.status(400).json({ error: err.code });
         return;
       }
 
