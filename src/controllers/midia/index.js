@@ -10,11 +10,12 @@ const upload = multer(multerConfig).single('midia');
 class MidiaController {
   async store(req, res) {
     return upload(req, res, async err => {
-      if (err) {
-        res.status(400).json({ error: err.code });
+      if (!req.file) {
+        res.status(400).json({ error: 'Tamanho de arquivo muito grande.' });
         return;
       }
 
+      const { mimetype, filename } = req.file;
       const { userId } = req;
 
       if (!userId || typeof userId !== 'string') {
@@ -22,7 +23,10 @@ class MidiaController {
         return;
       }
 
-      const { mimetype, filename } = req.file;
+      if (err) {
+        res.status(400).json({ error: err.code });
+        return;
+      }
 
       const midiaTypes = () => {
         if (imgsMimetypes.indexOf(mimetype) != -1) return 'imgs';
