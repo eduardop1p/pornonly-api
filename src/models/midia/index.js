@@ -73,7 +73,11 @@ module.exports = class Midia {
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'name'],
+          select: ['_id', 'name', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
         });
 
       if (!this.midia) {

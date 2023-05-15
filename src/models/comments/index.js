@@ -55,7 +55,14 @@ module.exports = class Comments {
 
       const results = await CommentsModel.find({ midiaId })
         .select(['_id', 'comment', 'userId', 'createIn'])
-        .populate({ path: 'userId', select: ['_id', 'name'] })
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
         .skip(startIndex)
         .limit(pageLimit)
         .sort({ createIn: -1 });

@@ -14,8 +14,9 @@ module.exports = class Login {
       this.user = await UsersModel.findOne({ ...this.body }).select([
         '_id',
         'name',
-        'midia',
         'email',
+        'profilePhoto',
+        'midia',
       ]);
 
       if (!this.user) {
@@ -27,7 +28,7 @@ module.exports = class Login {
       }
 
       return this.user;
-    } catch {
+    } catch (err) {
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',

@@ -4,6 +4,7 @@ const { resolve, extname } = require('path');
 const random = () => Math.round(Math.random() * 10000 + 10000);
 
 module.exports = {
+  limits: { fileSize: 25000000 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg') {
       return cb(new multer.MulterError('Formato de arquivo inválido.'));

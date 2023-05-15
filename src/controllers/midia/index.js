@@ -12,7 +12,10 @@ class MidiaController {
     return upload(req, res, async err => {
       if (err) {
         res.status(400).json({
-          error: err.code == 'LIMIT_FILE_SIZE' ? 'Tamanho de arquivo não suportado.' : err.code,
+          error:
+            err.code == 'LIMIT_FILE_SIZE'
+              ? 'Arquivo com tamanho acima de 500MB não suportado.'
+              : err.code,
         });
         return;
       }

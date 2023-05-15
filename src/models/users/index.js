@@ -3,6 +3,7 @@ const { Schema, model, Types } = require('mongoose');
 const usersSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  profilePhoto: [{ type: Types.ObjectId, ref: 'ProfilePhotos' }],
   midia: [{ type: Types.ObjectId, require: false, ref: 'Midia' }],
   password: { type: String, required: true },
   createIn: { type: Date, default: Date.now },
@@ -67,7 +68,11 @@ module.exports = class Users {
   async showUser(userId) {
     try {
       this.user = await UsersModel.findById(userId)
-        .select(['_id', 'name', 'email', 'midia', 'createIn'])
+        .select(['_id', 'name', 'email', 'profilePhoto', 'midia', 'createIn'])
+        .populate({
+          path: 'profilePhoto',
+          select: ['_id', 'url', 'userId'],
+        })
         .populate({
           path: 'midia',
           select: ['_id', 'title', 'midiaType', 'description', 'tags', 'url', 'createIn'],
