@@ -43,7 +43,7 @@ module.exports = class Midia {
           select: ['_id', 'name', 'email'],
         });
 
-      if (!results) {
+      if (!results.length) {
         this.errors.push({
           code: 400,
           msg: 'Erro ao pegar dados.',
@@ -216,7 +216,9 @@ module.exports = class Midia {
       }
 
       return this.user;
-    } catch {
+    } catch (err) {
+      console.log(err);
+
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',

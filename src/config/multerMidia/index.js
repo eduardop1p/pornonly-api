@@ -18,7 +18,7 @@ module.exports = {
   limits: { fileSize: 550000000 },
   fileFilter: (req, file, cb) => {
     if (midiaMimetypes.indexOf(file.mimetype) == -1) {
-      return cb(new multer.MulterError('Formato de arquivo inválido.'));
+      return cb(new multer.MulterError('Formato de arquivo não suportado.'));
     }
     return cb(null, true);
   },

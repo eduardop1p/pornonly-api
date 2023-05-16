@@ -43,6 +43,25 @@ class ProfileController {
     });
   }
 
+  async show(req, res) {
+    const { userId } = req;
+
+    if (!userId || typeof userId !== 'string') {
+      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      return;
+    }
+
+    const profilePhotos = new ProfilePhotos();
+    const profilePhotosInfo = await profilePhotos.showProfilePhoto(userId);
+
+    if (profilePhotos.errors.length) {
+      res.status(profilePhotos.errors[0].code).json({ error: profilePhotos.errors[0].msg });
+      return;
+    }
+
+    res.json({ photo: profilePhotosInfo });
+  }
+
   async delete(req, res) {
     const { userId } = req;
 

@@ -1,4 +1,7 @@
+const mongoose = require('mongoose');
 const { Schema, model, Types } = require('mongoose');
+const { rm } = require('fs/promises');
+const { resolve } = require('path');
 
 const usersSchema = new Schema({
   name: { type: String, required: true },
@@ -136,9 +139,10 @@ module.exports = class Users {
         });
         return;
       }
-
-      return;
-    } catch {
+      await mongoose.models.ProfilePhotos.deleteMany({ userId });
+      await mongoose.models.Comments.deleteMany({ userId });
+      await mongoose.models.Midia.deleteMany({ userId });
+    } catch (err) {
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',

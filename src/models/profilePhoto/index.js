@@ -89,6 +89,27 @@ module.exports = class ProfilePhotos {
     }
   }
 
+  async showProfilePhoto(userId) {
+    try {
+      this.photo = await ProfilePhotosModel.findOne({ userId }).select(['_id', 'url', 'createIn']);
+
+      if (!this.photo) {
+        this.errors.push({
+          code: 400,
+          msg: 'Erro ao pegar foto de usuário na base de dados.',
+        });
+        return;
+      }
+
+      return this.photo;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
   async getAllProfilePhotos() {
     try {
       this.photo = await ProfilePhotosModel.find().sort({
@@ -133,3 +154,5 @@ module.exports = class ProfilePhotos {
     }
   }
 };
+
+module.exports.ProfilePhotosModel = ProfilePhotosModel;
