@@ -17,19 +17,19 @@ module.exports = async function (req, res, next) {
 
     const { _id, email } = data;
 
-    const user = await UsersModel.findById(_id).select(['_id']);
+    // const user = await UsersModel.findById(_id).select(['_id']);
 
-    if (!user) {
-      res.status(401).json({ error: 'Usuário não existe na base de dados.' });
-      return;
-    }
+    // if (!user) {
+    //   res.status(401).json({ error: 'Usuário não existe na base de dados.' });
+    //   return;
+    // }
 
     req.userId = _id;
     req.email = email;
 
     next();
     return;
-  } catch {
+  } catch (err) {
     res.status(401).json({ error: 'Seu acesso é inválido faça login novalmente.' });
   }
 };

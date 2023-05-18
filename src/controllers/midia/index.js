@@ -10,7 +10,7 @@ const upload = multer(multerConfig).single('midia');
 class MidiaController {
   async store(req, res) {
     return upload(req, res, async err => {
-      if (err) {
+      if (err instanceof multer.MulterError) {
         res.status(400).json({
           error:
             err.code == 'LIMIT_FILE_SIZE'
@@ -20,7 +20,7 @@ class MidiaController {
         return;
       }
 
-      const { mimetype, filename } = req.file;
+      const { mimetype, key, location } = req.file;
       const { userId } = req;
 
       if (!userId || typeof userId !== 'string') {
@@ -37,8 +37,8 @@ class MidiaController {
       const { title, description } = req.body;
       const midiaType = midiaTypes().slice(0, -1);
       const tags = req.body.tags.split(' ');
-      const path = resolve(req.file.path);
-      const url = `${process.env.URL}/midia/uploads/${midiaTypes()}/${filename}`;
+      const path = key;
+      const url = location;
 
       const body = {
         title,
