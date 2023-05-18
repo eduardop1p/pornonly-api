@@ -8,7 +8,7 @@ const upload = multer(multerConfig).single('photo');
 class ProfileController {
   async store(req, res) {
     return upload(req, res, async err => {
-      if (err) {
+      if (err instanceof multer.MulterError) {
         res.status(400).json({
           error: err.code == 'LIMIT_FILE_SIZE' ? 'Tamanho de arquivo não suportado.' : err.code,
         });
@@ -22,8 +22,9 @@ class ProfileController {
         return;
       }
 
-      const { path, filename } = req.file;
-      const url = `${process.env.URL}/midia/uploads/profile-photo/imgs/${filename}`;
+      const { key, location } = req.file;
+      const url = location;
+      const path = key;
 
       const body = {
         userId,
