@@ -29,13 +29,13 @@ class MidiaController {
       }
 
       const midiaTypes = () => {
-        if (imgsMimetypes.indexOf(mimetype) != -1) return 'imgs';
-        if (gifsMimetypes.indexOf(mimetype) != -1) return 'gifs';
-        return 'videos';
+        if (imgsMimetypes.indexOf(mimetype) != -1) return 'img';
+        if (gifsMimetypes.indexOf(mimetype) != -1) return 'gif';
+        return 'video';
       };
 
       const { title, description } = req.body;
-      const midiaType = midiaTypes().slice(0, -1);
+      const midiaType = midiaTypes();
       const tags = req.body.tags.split(' ');
       const path = key;
       const url = location;
