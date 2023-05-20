@@ -165,6 +165,33 @@ class MidiaController {
     res.json({ midiaPack: midiaInfo });
   }
 
+  async indexSearch(req, res) {
+    const { apiKey } = req.params;
+    const searchQuery = String(req.query.search_query) || '';
+    const page = parseInt(req.query.search_query) || 1;
+
+    if (apiKey !== process.env.API_KEY) {
+      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      return;
+    }
+
+    if (searchQuery.length > 30) {
+      res.status(400).json({ error: 'Tente uma pesquisa com menos de 30 caracteres.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaSearchQuery(searchQuery, page);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midiaSearch: midiaInfo });
+  }
+
   async deleteOne(req, res) {
     const { midiaId } = req.params;
 

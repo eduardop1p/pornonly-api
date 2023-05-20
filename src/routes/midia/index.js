@@ -7,8 +7,9 @@ const router = Router();
 
 // tem paginação com query styng: page
 router.get('/get-all/:apiKey', midiaController.index);
-router.get('/:midiaId/:apiKey', midiaController.show);
+router.get('/get-midiaid/:midiaId/:apiKey', midiaController.show);
 router.get('/get-all-midia-packsid/:packId/:apiKey', midiaController.indexAllMidiaPackId);
+router.get('/search/:apiKey', midiaController.indexSearch);
 
 router.get('/get-all-midia-userid', loginRequired, midiaController.indexAllMidiaUserId);
 router.post('/', loginRequired, midiaController.store);
