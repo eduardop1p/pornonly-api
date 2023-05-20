@@ -142,6 +142,8 @@ module.exports = class Users {
       await mongoose.models.ProfilePhotos.deleteMany({ userId });
       await mongoose.models.Comments.deleteMany({ userId });
       await mongoose.models.Midia.deleteMany({ userId });
+
+      return;
     } catch (err) {
       this.errors.push({
         code: 500,

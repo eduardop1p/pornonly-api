@@ -35,6 +35,21 @@ class MidiaController {
       };
 
       const { title, description } = req.body;
+
+      if (title.length > 30) {
+        res
+          .status(400)
+          .json({ error: 'Titulo muito grande, tente um titulo com menos de 30 caracteres.' });
+        return;
+      }
+
+      if (description.length > 100) {
+        res.status(400).json({
+          error: 'Descrição muito grande, tente uma descrição com menos de 100 caracteres.',
+        });
+        return;
+      }
+
       const midiaType = midiaTypes();
       const tags = req.body.tags.split(' ');
       const path = key;
@@ -103,6 +118,43 @@ class MidiaController {
     }
 
     res.json({ midiaUsers: midiaInfo });
+  }
+
+  async indexAllMidiaUserId(req, res) {
+    const { userId } = req;
+    const page = parseInt(req.query.page) || 1;
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaUserId(userId, page);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midiaUser: midiaInfo });
+  }
+
+  async indexAllMidiaPackId(req, res) {
+    const { apiKey, packId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+
+    if (apiKey !== process.env.API_KEY) {
+      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaPackId(packId, page);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midiaPack: midiaInfo });
   }
 
   async deleteOne(req, res) {

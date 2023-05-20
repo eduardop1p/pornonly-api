@@ -10,6 +10,7 @@ const MidiaSchema = new Schema({
   midiaType: { type: String, require: true },
   tags: { type: Array },
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
+  packId: [{ type: Types.ObjectId, ref: 'Packs' }],
   path: { type: String, require: true },
   url: { type: String, require: true },
   createIn: { type: Date, default: Date.now },
@@ -43,14 +44,6 @@ module.exports = class Midia {
           select: ['_id', 'name', 'email'],
         });
 
-      if (!results.length) {
-        this.errors.push({
-          code: 400,
-          msg: 'Erro ao pegar dados.',
-        });
-        return;
-      }
-
       this.midia = {
         results,
         currentPage: page,
@@ -60,6 +53,82 @@ module.exports = class Midia {
 
       return this.midia;
     } catch (err) {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async getAllMidiaUserId(userId, page) {
+    const pageLimit = 30;
+    const startIndex = (page - 1) * pageLimit;
+    const endIndex = page * pageLimit;
+
+    try {
+      const results = await MidiaModel.find({ userId })
+        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
+        .skip(startIndex)
+        .limit(pageLimit)
+        .sort({ createIn: -1 });
+
+      const total = results.length;
+
+      this.midia = {
+        results,
+        currentPage: page,
+        totalPages: Math.ceil(total / pageLimit),
+        totalResults: total,
+      };
+
+      return this.midia;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async getAllMidiaPackId(packId, page) {
+    const pageLimit = 30;
+    const startIndex = (page - 1) * pageLimit;
+    const endIndex = page * pageLimit;
+
+    try {
+      const results = await MidiaModel.find({ packId })
+        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
+        .skip(startIndex)
+        .limit(pageLimit)
+        .sort({ createIn: -1 });
+
+      const total = results.length;
+
+      this.midia = {
+        results,
+        currentPage: page,
+        totalPages: Math.ceil(total / pageLimit),
+        totalResults: total,
+      };
+
+      return this.midia;
+    } catch {
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',
@@ -131,14 +200,6 @@ module.exports = class Midia {
     try {
       this.midia = await MidiaModel.findByIdAndDelete(midiaId).select(['_id', 'path', 'userId']);
 
-      const userId = this.midia.userId[0];
-
-      this.user = await UsersModel.findById(userId);
-      this.user.midia = this.user.midia.filter(
-        id => id.toHexString() != this.midia._id.toHexString()
-      );
-      this.user.save();
-
       if (!this.midia) {
         this.errors.push({
           code: 400,
@@ -147,14 +208,13 @@ module.exports = class Midia {
         return;
       }
 
-      try {
-        await rm(resolve(this.midia.path));
-      } catch {
-        this.errors.push({
-          code: 500,
-          msg: 'Erro interno no servidor, tente deletar a publicação novalmente.',
-        });
-      }
+      const userId = this.midia.userId[0];
+
+      this.user = await UsersModel.findById(userId);
+      this.user.midia = this.user.midia.filter(
+        id => id.toHexString() != this.midia._id.toHexString()
+      );
+      await this.user.save();
 
       return;
     } catch {
@@ -181,7 +241,7 @@ module.exports = class Midia {
 
       this.user = await UsersModel.findById(userId);
       this.user.midia = [];
-      this.user.save();
+      await this.user.save();
 
       try {
         this.midia.forEach(async midia => {

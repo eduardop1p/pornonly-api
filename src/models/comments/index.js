@@ -67,14 +67,6 @@ module.exports = class Comments {
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      if (!results.length) {
-        this.errors.push({
-          code: 400,
-          msg: 'Erro ao obter comentarios.',
-        });
-        return;
-      }
-
       this.comment = {
         results,
         currentPage: page,

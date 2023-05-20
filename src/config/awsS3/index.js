@@ -1,10 +1,10 @@
-const AWS = require('aws-sdk');
+const { DynamoDB } = require('@aws-sdk/client-dynamodb');
 const dotEnv = require('dotenv');
 const { resolve } = require('path');
 
 dotEnv.config(resolve(__dirname, '..', '..', '..', '.env'));
 
-const s3 = new AWS.DynamoDB({
+const s3 = new DynamoDB({
   region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY,
