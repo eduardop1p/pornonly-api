@@ -10,7 +10,6 @@
   "author": "yung eduardo",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.335.0",
     "@aws-sdk/client-s3": "^3.332.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

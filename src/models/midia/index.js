@@ -3,6 +3,7 @@ const { rm } = require('fs/promises');
 const { resolve } = require('path');
 
 const { UsersModel } = require('../users');
+const deleteObjectS3 = require('../../services/deleteObjectS3');
 
 const MidiaSchema = new Schema({
   title: { type: String, required: false, default: 'Nenhum titulo aqui.' },
@@ -216,6 +217,15 @@ module.exports = class Midia {
       );
       await this.user.save();
 
+      try {
+        await deleteObjectS3(this.midia.path);
+      } catch {
+        this.errors.push({
+          code: 400,
+          msg: 'Erro ao deletar publicação tente novalmente.',
+        });
+      }
+
       return;
     } catch {
       this.errors.push({
@@ -245,7 +255,7 @@ module.exports = class Midia {
 
       try {
         this.midia.forEach(async midia => {
-          await rm(resolve(midia.path));
+          await deleteObjectS3(midia.path);
         });
       } catch {
         this.errors.push({

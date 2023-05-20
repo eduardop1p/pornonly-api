@@ -3,6 +3,7 @@ const { rm } = require('fs/promises');
 const { resolve } = require('path');
 
 const { UsersModel } = require('../users');
+const deleteObjectS3 = require('../../services/deleteObjectS3');
 
 const ProfilePhotosSchema = new Schema({
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
@@ -69,7 +70,7 @@ module.exports = class ProfilePhotos {
       }
 
       try {
-        await rm(resolve(this.photo.path));
+        await deleteObjectS3(this.photo.path);
       } catch {
         this.errors.push({
           code: 500,
@@ -135,7 +136,7 @@ module.exports = class ProfilePhotos {
 
   async userExist(userId) {
     try {
-      this.user = await UsersModel.findById(userId);
+      this.user = await UsersModel.findById(userId).select(['_id']);
 
       if (!this.user) {
         this.errors.push({

@@ -2,6 +2,7 @@ const multer = require('multer');
 
 const ProfilePhotos = require('../../models/profilePhoto');
 const multerConfig = require('../../config/multerProfilePhoto');
+const deleteObjectS3 = require('../../services/deleteObjectS3');
 
 const upload = multer(multerConfig).single('photo');
 
@@ -36,6 +37,13 @@ class ProfileController {
       await profilePhotos.storeProfilePhoto(userId);
 
       if (profilePhotos.errors.length) {
+        try {
+          await deleteObjectS3(path);
+        } catch {
+          res.status(500).json({
+            error: 'Erro interno no servidor tente novalmente.',
+          });
+        }
         res.status(profilePhotos.errors[0].code).json({ error: profilePhotos.errors[0].msg });
         return;
       }

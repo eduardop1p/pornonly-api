@@ -3,6 +3,8 @@ const { Schema, model, Types } = require('mongoose');
 const { rm } = require('fs/promises');
 const { resolve } = require('path');
 
+const deleteObjectS3 = require('../../services/deleteObjectS3');
+
 const usersSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -131,6 +133,8 @@ module.exports = class Users {
   async deleteUser(userId) {
     try {
       this.user = await UsersModel.findByIdAndDelete(userId);
+      const profilePhoto = await mongoose.models.ProfilePhotos.findOne({ userId });
+      const midias = await mongoose.models.Midia.find({ userId });
 
       if (!this.user) {
         this.errors.push({
@@ -142,6 +146,26 @@ module.exports = class Users {
       await mongoose.models.ProfilePhotos.deleteMany({ userId });
       await mongoose.models.Comments.deleteMany({ userId });
       await mongoose.models.Midia.deleteMany({ userId });
+
+      try {
+        await deleteObjectS3(profilePhoto.path);
+      } catch {
+        this.errors.push({
+          code: 400,
+          msg: 'Erro ao deletar foto de perfil.',
+        });
+      }
+
+      midias.forEach(async midia => {
+        try {
+          await deleteObjectS3(midia.path);
+        } catch {
+          this.errors.push({
+            code: 400,
+            msg: 'Erro ao deletar todas as publicações do perfil.',
+          });
+        }
+      });
 
       return;
     } catch (err) {

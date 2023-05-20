@@ -4,6 +4,7 @@ const { resolve } = require('path');
 const Midia = require('../../models/midia');
 const multerConfig = require('../../config/multerMidia');
 const { imgsMimetypes, gifsMimetypes } = require('../../services/midiaMimetypes');
+const deleteObjectS3 = require('../../services/deleteObjectS3');
 
 const upload = multer(multerConfig).single('midia');
 
@@ -70,6 +71,13 @@ class MidiaController {
       await midia.storeMidia();
 
       if (midia.errors.length) {
+        try {
+          await deleteObjectS3(path);
+        } catch {
+          res.status(500).json({
+            error: 'Erro interno no servidor tente novalmente.',
+          });
+        }
         res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
         return;
       }
