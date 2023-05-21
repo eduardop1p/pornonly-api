@@ -21,7 +21,12 @@ class MidiaController {
         return;
       }
 
+      if (!req.file) {
+        res.status(400).json({ error: 'Erro desconhecido tente novalmente' });
+        return;
+      }
       const { mimetype, key, location } = req.file;
+
       const { userId } = req;
 
       if (!userId || typeof userId !== 'string') {
@@ -52,7 +57,7 @@ class MidiaController {
       }
 
       const midiaType = midiaTypes();
-      const tags = req.body.tags.split(' ');
+      const tags = req.body.tags.trimEnd().split(' ');
       const path = key;
       const url = location;
 
@@ -156,6 +161,27 @@ class MidiaController {
     const midia = new Midia();
 
     const midiaInfo = await midia.getAllMidiaPackId(packId, page);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midiaPack: midiaInfo });
+  }
+
+  async indexAllMidiaType(req, res) {
+    const { apiKey, midiaType } = req.params;
+    const page = parseInt(req.query.page) || 1;
+
+    if (apiKey !== process.env.API_KEY) {
+      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaType(midiaType, page);
 
     if (midia.errors.length) {
       res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });

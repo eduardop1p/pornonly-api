@@ -137,6 +137,44 @@ module.exports = class Midia {
     }
   }
 
+  async getAllMidiaType(midiaType, page) {
+    const pageLimit = 30;
+    const startIndex = (page - 1) * pageLimit;
+    const endIndex = page * pageLimit;
+
+    try {
+      const results = await MidiaModel.find({ midiaType })
+        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
+        .skip(startIndex)
+        .limit(pageLimit)
+        .sort({ createIn: -1 });
+
+      const total = results.length;
+
+      this.midia = {
+        results,
+        currentPage: page,
+        totalPages: Math.ceil(total / pageLimit),
+        totalResults: total,
+      };
+
+      return this.midia;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
   async getAllMidiaSearchQuery(searchQuery, page) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
