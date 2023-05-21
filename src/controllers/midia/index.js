@@ -168,7 +168,7 @@ class MidiaController {
   async indexSearch(req, res) {
     const { apiKey } = req.params;
     const searchQuery = String(req.query.search_query) || '';
-    const page = parseInt(req.query.search_query) || 1;
+    const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
       res.status(401).json({ error: 'Acesso permitido somente para adms.' });
@@ -183,6 +183,33 @@ class MidiaController {
     const midia = new Midia();
 
     const midiaInfo = await midia.getAllMidiaSearchQuery(searchQuery, page);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midiaSearch: midiaInfo });
+  }
+
+  async indexSearchTags(req, res) {
+    const { apiKey } = req.params;
+    const searchTags = req.query.search_tags.toLowerCase().split(',') || [];
+    const page = parseInt(req.query.page) || 1;
+
+    if (apiKey !== process.env.API_KEY) {
+      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      return;
+    }
+
+    if (searchTags.length > 5) {
+      res.status(400).json({ error: 'Tente uma pesquisa com menos de 5 tags.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaSearchTags(searchTags, page);
 
     if (midia.errors.length) {
       res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });

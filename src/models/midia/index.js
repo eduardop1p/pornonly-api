@@ -9,7 +9,7 @@ const MidiaSchema = new Schema({
   title: { type: String, required: false, text: true, default: 'Nenhum titulo aqui.' },
   description: { type: String, default: 'Nenhum descrição para este titulo.' },
   midiaType: { type: String, require: true },
-  tags: { type: Array, text: true },
+  tags: { type: Array },
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
   packId: [{ type: Types.ObjectId, ref: 'Packs' }],
   path: { type: String, require: true },
@@ -143,7 +143,48 @@ module.exports = class Midia {
     const endIndex = page * pageLimit;
 
     try {
-      const results = await MidiaModel.find({ $text: { $search: searchQuery } })
+      // const results = await MidiaModel.find({ $text: { $search: searchQuery } })
+      const results = await MidiaModel.find({ title: { $regex: searchQuery, $options: 'i' } })
+        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
+        .skip(startIndex)
+        .limit(pageLimit)
+        .sort({ createIn: -1 });
+
+      const total = results.length;
+
+      this.midia = {
+        results,
+        currentPage: page,
+        totalPages: Math.ceil(total / pageLimit),
+        totalResults: total,
+      };
+
+      return this.midia;
+    } catch (err) {
+      console.log(err);
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async getAllMidiaSearchTags(searchTags, page) {
+    const pageLimit = 30;
+    const startIndex = (page - 1) * pageLimit;
+    const endIndex = page * pageLimit;
+
+    try {
+      // const results = await MidiaModel.find({ $text: { $search: searchTags } })
+      const results = await MidiaModel.find({ tags: { $all: searchTags } })
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .populate({
           path: 'userId',
