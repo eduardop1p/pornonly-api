@@ -11,7 +11,7 @@ const usersSchema = new Schema({
   profilePhoto: [{ type: Types.ObjectId, ref: 'ProfilePhotos' }],
   midia: [{ type: Types.ObjectId, require: false, ref: 'Midia' }],
   password: { type: String, required: true },
-  createIn: { type: Date, default: Date.now },
+  createIn: { type: Date, default: new Date() },
 });
 
 const UsersModel = model('Users', usersSchema);

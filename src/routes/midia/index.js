@@ -12,6 +12,7 @@ router.get('/get-all-midia-packsid/:packId/:apiKey', midiaController.indexAllMid
 router.get('/search/:apiKey', midiaController.indexSearch);
 router.get('/search-tags/:apiKey', midiaController.indexSearchTags);
 router.get('/get-all-midia-type/:midiaType/:apiKey', midiaController.indexAllMidiaType);
+router.get('/get-all-midia-day/:apiKey', midiaController.indexAllMidiaDay);
 
 router.get('/get-all-midia-userid', loginRequired, midiaController.indexAllMidiaUserId);
 router.post('/', loginRequired, midiaController.store);

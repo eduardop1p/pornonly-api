@@ -9,7 +9,7 @@ const ProfilePhotosSchema = new Schema({
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
   url: { type: String },
   path: { type: String },
-  createIn: { type: Date, default: Date.now },
+  createIn: { type: Date, default: new Date() },
 });
 
 const ProfilePhotosModel = model('ProfilePhotos', ProfilePhotosSchema);

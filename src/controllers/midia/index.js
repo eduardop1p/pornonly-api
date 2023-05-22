@@ -130,7 +130,7 @@ class MidiaController {
       return;
     }
 
-    res.json({ midiaUsers: midiaInfo });
+    res.json({ midia: midiaInfo });
   }
 
   async indexAllMidiaUserId(req, res) {
@@ -146,7 +146,7 @@ class MidiaController {
       return;
     }
 
-    res.json({ midiaUser: midiaInfo });
+    res.json({ midia: midiaInfo });
   }
 
   async indexAllMidiaPackId(req, res) {
@@ -167,7 +167,7 @@ class MidiaController {
       return;
     }
 
-    res.json({ midiaPack: midiaInfo });
+    res.json({ midia: midiaInfo });
   }
 
   async indexAllMidiaType(req, res) {
@@ -188,7 +188,28 @@ class MidiaController {
       return;
     }
 
-    res.json({ midiaPack: midiaInfo });
+    res.json({ midia: midiaInfo });
+  }
+
+  async indexAllMidiaDay(req, res) {
+    const { apiKey } = req.params;
+    const page = parseInt(req.query.page) || 1;
+
+    if (apiKey !== process.env.API_KEY) {
+      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      return;
+    }
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaDay(page);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midia: midiaInfo });
   }
 
   async indexSearch(req, res) {
@@ -215,7 +236,7 @@ class MidiaController {
       return;
     }
 
-    res.json({ midiaSearch: midiaInfo });
+    res.json({ midia: midiaInfo });
   }
 
   async indexSearchTags(req, res) {
@@ -242,7 +263,7 @@ class MidiaController {
       return;
     }
 
-    res.json({ midiaSearch: midiaInfo });
+    res.json({ midia: midiaInfo });
   }
 
   async deleteOne(req, res) {

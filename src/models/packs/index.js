@@ -6,7 +6,7 @@ const packsSchema = new Schema({
   title: { type: String, required: true, unique: true },
   description: { type: String },
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
-  createIn: { type: Date, default: Date.now },
+  createIn: { type: Date, default: new Date() },
 });
 
 const PacksModel = model('Packs', packsSchema);
