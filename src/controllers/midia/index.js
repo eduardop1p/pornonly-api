@@ -25,7 +25,7 @@ class MidiaController {
         res.status(400).json({ error: 'Erro desconhecido tente novalmente' });
         return;
       }
-      const { mimetype, key, location } = req.file;
+      const { mimetype, key } = req.file;
 
       const { userId } = req;
 
@@ -59,7 +59,7 @@ class MidiaController {
       const midiaType = midiaTypes();
       const tags = req.body.tags.trimEnd().split(' ');
       const path = key;
-      const url = location;
+      const url = `${process.env.CURRENT_DOMAIN}/${key}`;
 
       const body = {
         title,

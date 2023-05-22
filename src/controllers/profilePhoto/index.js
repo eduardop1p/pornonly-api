@@ -23,9 +23,9 @@ class ProfileController {
         return;
       }
 
-      const { key, location } = req.file;
-      const url = location;
+      const { key } = req.file;
       const path = key;
+      const url = `${process.env.CURRENT_DOMAIN}/${key}`;
 
       const body = {
         userId,
