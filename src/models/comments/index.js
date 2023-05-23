@@ -51,8 +51,6 @@ module.exports = class Comments {
     const endIndex = page * pageLimit;
 
     try {
-      const total = await CommentsModel.countDocuments();
-
       const results = await CommentsModel.find({ midiaId })
         .select(['_id', 'comment', 'userId', 'createIn'])
         .populate({
@@ -66,6 +64,8 @@ module.exports = class Comments {
         .skip(startIndex)
         .limit(pageLimit)
         .sort({ createIn: -1 });
+
+      const total = results.length;
 
       this.comment = {
         results,

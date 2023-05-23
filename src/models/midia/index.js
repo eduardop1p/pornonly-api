@@ -3,6 +3,7 @@ const { rm } = require('fs/promises');
 const { resolve } = require('path');
 
 const { UsersModel } = require('../users');
+const { ProfilePhotosModel } = require('../profilePhoto');
 const deleteObjectS3 = require('../../services/deleteObjectS3');
 
 const MidiaSchema = new Schema({
@@ -35,15 +36,63 @@ module.exports = class Midia {
     try {
       const total = await MidiaModel.countDocuments();
 
-      const results = await MidiaModel.find() // tras os resultados em ordem crescente com sort 1
-        .select(['_id', 'title', 'description', 'userId', 'url', 'createIn'])
-        .sort({ createIn: 1 })
-        .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
-        .limit(pageLimit)
-        .populate({
-          path: 'userId',
-          select: ['_id', 'name', 'email'],
-        });
+      // const results = await MidiaModel.find() // tras os resultados em ordem crescente com sort 1
+      //   .select(['_id', 'title', 'description', 'userId', 'url', 'createIn'])
+      //   .sort({ createIn: 1 })
+      //   .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
+      //   .limit(pageLimit)
+      //   .populate({
+      //     path: 'userId',
+      //     select: ['_id', 'name', 'email', 'profilePhoto'],
+      //     populate: { path: 'profilePhoto', select: ['_id', 'url'] }
+      //   });
+
+      // consulta aleatória com todos os parametros acima mais com aggregate e $sample
+      const results = await MidiaModel.aggregate([
+        {
+          $lookup: {
+            from: UsersModel.collection.name,
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userId',
+            pipeline: [
+              {
+                $project: { _id: true, name: true, profilePhoto: true },
+              },
+            ],
+          },
+        },
+        { $unwind: { path: '$userId' } },
+        {
+          $lookup: {
+            from: ProfilePhotosModel.collection.name,
+            localField: 'userId.profilePhoto',
+            foreignField: '_id',
+            as: 'userId.profilePhoto',
+            pipeline: [
+              {
+                $project: {
+                  _id: true,
+                  url: true,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $project: {
+            _id: true,
+            title: true,
+            description: true,
+            userId: true,
+            url: true,
+            createIn: true,
+          },
+        },
+        { $sample: { size: pageLimit } },
+        { $skip: startIndex },
+        { $limit: pageLimit },
+      ]);
 
       this.midia = {
         results,
@@ -54,6 +103,7 @@ module.exports = class Midia {
 
       return this.midia;
     } catch (err) {
+      console.log(err);
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',
