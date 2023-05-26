@@ -9,6 +9,7 @@ const router = Router();
 router.get('/:midiaId/:apiKey', commentsController.index);
 
 router.post('/:midiaId', loginRequired, commentsController.store);
-router.delete('/:commentId', loginRequired, commentsController.delete);
+router.delete('/delete-one/:commentId', loginRequired, commentsController.deleteOne);
+// router.delete('/delete-all', loginRequired, commentsController.deleteAll);
 
 module.exports = router;

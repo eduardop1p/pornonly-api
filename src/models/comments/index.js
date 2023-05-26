@@ -83,7 +83,7 @@ module.exports = class Comments {
     }
   }
 
-  async deleteComment(commentId) {
+  async deleteOneComment(commentId) {
     try {
       this.comment = await CommentsModel.findByIdAndDelete(commentId);
 
@@ -91,6 +91,27 @@ module.exports = class Comments {
         this.errors.push({
           code: 400,
           msg: 'Erro ao deletar comentário.',
+        });
+        return;
+      }
+
+      return;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async deleteAllComment(userId) {
+    try {
+      this.comment = await CommentsModel.deleteMany({ userId });
+
+      if (!this.comment.deletedCount) {
+        this.errors.push({
+          code: 400,
+          msg: 'Erro ao deletar todos os comentários.',
         });
         return;
       }

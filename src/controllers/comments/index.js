@@ -52,7 +52,7 @@ class CommentsController {
     res.json({ commentsMidia: commentsInfo });
   }
 
-  async delete(req, res) {
+  async deleteOne(req, res) {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
@@ -63,7 +63,7 @@ class CommentsController {
     const { commentId } = req.params;
 
     const comments = new Comments();
-    await comments.deleteComment(commentId);
+    await comments.deleteOneComment(commentId);
 
     if (comments.errors.length) {
       res.status(comments.errors[0].code).json({ error: comments.errors[0].msg });
@@ -71,6 +71,25 @@ class CommentsController {
     }
 
     res.json({ success: 'Comentário deletado.' });
+  }
+
+  async deleteAll(req, res) {
+    const { userId } = req;
+
+    if (!userId || typeof userId !== 'string') {
+      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      return;
+    }
+
+    const comments = new Comments();
+    await comments.deleteAllComment(userId);
+
+    if (comments.errors.length) {
+      res.status(comments.errors[0].code).json({ error: comments.errors[0].msg });
+      return;
+    }
+
+    res.json({ success: 'Comentários deletados.' });
   }
 }
 
