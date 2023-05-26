@@ -25,7 +25,7 @@ class PacksController {
       return;
     }
 
-    const midiaId = req.query.midiaId.split(',') || [];
+    const midiaId = req.query.midiaId ? req.query.midiaId.split(',') : [];
 
     const body = {
       title,
@@ -59,7 +59,7 @@ class PacksController {
       return;
     }
 
-    const midiaId = req.query.midiaId.split(',') || [];
+    const midiaId = req.query.midiaId ? req.query.midiaId.split(',') : [];
 
     const packs = new Packs();
     await packs.storeMidiaInPack(packId, midiaId);
@@ -87,7 +87,7 @@ class PacksController {
       return;
     }
 
-    const midiaId = req.query.midiaId.split(',') || [];
+    const midiaId = req.query.midiaId || [];
 
     const packs = new Packs();
     await packs.deleteMidiaInPack(packId, midiaId);

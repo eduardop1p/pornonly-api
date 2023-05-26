@@ -1,12 +1,14 @@
 const { Schema, Types, model } = require('mongoose');
 
 const { MidiaModel } = require('../midia');
+const { UsersModel } = require('../users');
+const { ProfilePhotosModel } = require('../profilePhoto');
 
 const packsSchema = new Schema({
   title: { type: String, required: true, unique: true },
   description: { type: String },
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
-  createIn: { type: Date, default: new Date() },
+  createIn: { type: Date, default: Date.now },
 });
 
 const PacksModel = model('Packs', packsSchema);
@@ -26,21 +28,43 @@ module.exports = class Packs {
     try {
       const total = await PacksModel.countDocuments();
 
-      const results = await PacksModel.find()
-        .select(['_id', 'title', 'description', 'userId', 'createIn'])
-        .populate({
-          path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
-          populate: {
-            path: 'profilePhoto',
-            select: ['_id', 'url'],
+      const results = await PacksModel.aggregate([
+        {
+          $sample: { size: pageLimit },
+        },
+        {
+          $project: { _id: true, title: true, description: true, userId: true, createIn: true },
+        },
+        {
+          $lookup: {
+            from: UsersModel.collection.name,
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userId',
+            pipeline: [
+              {
+                $project: { _id: true, name: true, profilePhoto: true },
+              },
+            ],
           },
-        })
-        .skip(startIndex)
-        .limit(pageLimit)
-        .sort({
-          createIn: -1,
-        });
+        },
+        { $unwind: { path: '$userId' } },
+        {
+          $lookup: {
+            from: ProfilePhotosModel.collection.name,
+            localField: 'userId.profilePhoto',
+            foreignField: '_id',
+            as: 'userId.profilePhoto',
+            pipeline: [
+              {
+                $project: { _id: true, url: true },
+              },
+            ],
+          },
+        },
+        { $skip: startIndex },
+        { $limit: pageLimit },
+      ]);
 
       this.pack = {
         results,
@@ -107,7 +131,7 @@ module.exports = class Packs {
         return;
       }
 
-      if (!midiaId.join('')) return;
+      if (!midiaId.length) return;
 
       const midias = await MidiaModel.find({ _id: { $in: midiaId } });
       midias.forEach(async midia => {
@@ -117,7 +141,7 @@ module.exports = class Packs {
 
       return;
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       this.errors.push({
         code: 500,
         msg: 'Erro interno no servidor.',
@@ -127,7 +151,7 @@ module.exports = class Packs {
 
   async storeMidiaInPack(packId, midiaId) {
     try {
-      if (!midiaId.join('')) return;
+      if (!midiaId.length) return;
 
       const midias = await MidiaModel.find({ _id: { $in: midiaId } });
 
@@ -156,7 +180,7 @@ module.exports = class Packs {
 
   async deleteMidiaInPack(packId, midiaId) {
     try {
-      if (!midiaId.join('')) return;
+      if (!midiaId.length) return;
 
       const midias = await MidiaModel.find({ _id: { $in: midiaId } });
 
@@ -195,6 +219,12 @@ module.exports = class Packs {
         return;
       }
 
+      let midias = await MidiaModel.find({ packId });
+      midias.forEach(async midia => {
+        midia.packId = [];
+        await midia.save();
+      });
+
       return;
     } catch {
       this.errors.push({
@@ -215,6 +245,12 @@ module.exports = class Packs {
         });
         return;
       }
+
+      let midias = await MidiaModel.find({ userId });
+      midias.forEach(async midia => {
+        midia.packId = [];
+        await midia.save();
+      });
 
       return;
     } catch {

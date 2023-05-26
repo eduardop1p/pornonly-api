@@ -25,7 +25,7 @@ class ProfileController {
 
       const { key } = req.file;
       const path = key;
-      const url = `${process.env.CURRENT_DOMAIN}/${key}`;
+      const url = `${process.env.CURRENT_DOMAIN}/${path}`;
 
       const body = {
         userId,
@@ -43,6 +43,7 @@ class ProfileController {
           res.status(500).json({
             error: 'Erro interno no servidor tente novalmente.',
           });
+          return;
         }
         res.status(profilePhotos.errors[0].code).json({ error: profilePhotos.errors[0].msg });
         return;

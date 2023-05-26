@@ -6,7 +6,7 @@ const CommentsSchema = new Schema({
   comment: { type: String, required: false },
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
   midiaId: [{ type: Types.ObjectId, ref: 'Midia' }],
-  createIn: { type: Date, default: new Date() },
+  createIn: { type: Date, default: Date.now },
 });
 
 const CommentsModel = model('Comments', CommentsSchema);

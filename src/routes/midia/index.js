@@ -14,6 +14,7 @@ router.get('/search-tags/:apiKey', midiaController.indexSearchTags);
 router.get('/get-all-midia-type/:midiaType/:apiKey', midiaController.indexAllMidiaType);
 router.get('/get-all-midia-day/:apiKey', midiaController.indexAllMidiaDay);
 
+router.get('/get-all-midia-packsnoid', loginRequired, midiaController.indexAllMidiaPackNoId);
 router.get('/get-all-midia-userid', loginRequired, midiaController.indexAllMidiaUserId);
 router.post('/', loginRequired, midiaController.store);
 router.delete('/delete-one/:midiaId', loginRequired, midiaController.deleteOne);

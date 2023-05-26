@@ -25,6 +25,7 @@ class MidiaController {
         res.status(400).json({ error: 'Erro desconhecido tente novalmente' });
         return;
       }
+
       const { mimetype, key } = req.file;
 
       const { userId } = req;
@@ -59,7 +60,7 @@ class MidiaController {
       const midiaType = midiaTypes();
       const tags = req.body.tags.trimEnd().split(' ');
       const path = key;
-      const url = `${process.env.CURRENT_DOMAIN}/${key}`;
+      const url = `${process.env.CURRENT_DOMAIN}/${path}`;
 
       const body = {
         title,
@@ -82,6 +83,7 @@ class MidiaController {
           res.status(500).json({
             error: 'Erro interno no servidor tente novalmente.',
           });
+          return;
         }
         res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
         return;
@@ -161,6 +163,22 @@ class MidiaController {
     const midia = new Midia();
 
     const midiaInfo = await midia.getAllMidiaPackId(packId, page);
+
+    if (midia.errors.length) {
+      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midia: midiaInfo });
+  }
+
+  async indexAllMidiaPackNoId(req, res) {
+    const page = parseInt(req.query.page) || 1;
+    const { userId } = req;
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaPackNoId(page, userId);
 
     if (midia.errors.length) {
       res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });

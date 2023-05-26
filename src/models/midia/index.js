@@ -15,7 +15,7 @@ const MidiaSchema = new Schema({
   packId: [{ type: Types.ObjectId, ref: 'Packs' }],
   path: { type: String, require: true },
   url: { type: String, require: true },
-  createIn: { type: Date, default: new Date() },
+  createIn: { type: Date, default: Date.now },
 });
 
 const MidiaModel = model('Midia', MidiaSchema);
@@ -156,7 +156,65 @@ module.exports = class Midia {
 
     try {
       const results = await MidiaModel.find({ packId })
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .select([
+          '_id',
+          'title',
+          'description',
+          'midiaType',
+          'tags',
+          'userId',
+          'packId',
+          'url',
+          'createIn',
+        ])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'name', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
+        .skip(startIndex)
+        .limit(pageLimit)
+        .sort({ createIn: -1 });
+
+      const total = results.length;
+
+      this.midia = {
+        results,
+        currentPage: page,
+        totalPages: Math.ceil(total / pageLimit),
+        totalResults: total,
+      };
+
+      return this.midia;
+    } catch {
+      this.errors.push({
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async getAllMidiaPackNoId(page, userId) {
+    const pageLimit = 30;
+    const startIndex = (page - 1) * pageLimit;
+    const endIndex = page * pageLimit;
+
+    try {
+      const results = await MidiaModel.find({ packId: [], userId })
+        .select([
+          '_id',
+          'title',
+          'description',
+          'midiaType',
+          'tags',
+          'userId',
+          'packId',
+          'url',
+          'createIn',
+        ])
         .populate({
           path: 'userId',
           select: ['_id', 'name', 'profilePhoto'],
@@ -193,19 +251,61 @@ module.exports = class Midia {
     const endIndex = page * pageLimit;
 
     try {
-      const results = await MidiaModel.find({ midiaType })
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
-        .populate({
-          path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
-          populate: {
-            path: 'profilePhoto',
-            select: ['_id', 'url'],
+      // const results = await MidiaModel.find({ midiaType })
+      //   .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+      //   .populate({
+      //     path: 'userId',
+      //     select: ['_id', 'name', 'profilePhoto'],
+      //     populate: {
+      //       path: 'profilePhoto',
+      //       select: ['_id', 'url'],
+      //     },
+      //   })
+      //   .skip(startIndex)
+      //   .limit(pageLimit)
+      //   .sort({ createIn: -1 });
+
+      const results = await MidiaModel.aggregate([
+        { $match: { midiaType } },
+        { $sample: { size: pageLimit } },
+        {
+          $lookup: {
+            from: UsersModel.collection.name,
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userId',
+            pipeline: [{ $project: { _id: true, name: true, profilePhoto: true } }],
           },
-        })
-        .skip(startIndex)
-        .limit(pageLimit)
-        .sort({ createIn: -1 });
+        },
+        { $unwind: { path: '$userId' } },
+        {
+          $lookup: {
+            from: ProfilePhotosModel.collection.name,
+            localField: 'userId.profilePhoto',
+            foreignField: '_id',
+            as: 'userId.profilePhoto',
+            pipeline: [
+              {
+                $project: { _id: true, url: true },
+              },
+            ],
+          },
+        },
+        {
+          $project: {
+            _id: true,
+            title: true,
+            description: true,
+            midiaType: true,
+            tags: true,
+            userId: true,
+            url: true,
+            createIn: true,
+          },
+        },
+        { $skip: startIndex },
+        { $limit: pageLimit },
+      ]);
 
       const total = results.length;
 
