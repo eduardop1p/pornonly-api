@@ -46,7 +46,7 @@ module.exports = class Login {
         this.errors.push({
           type: 'email',
           code: 400,
-          msg: 'O E-mail inserido não pertence a nenhuma conta..',
+          msg: 'O E-mail inserido não pertence a nenhuma conta.',
         });
         return;
       }
