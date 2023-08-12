@@ -1,4 +1,5 @@
 const { isEmail } = require('validator/validator');
+const { serialize } = require('cookie');
 const jwt = require('jsonwebtoken');
 
 const Login = require('../../models/login');
@@ -22,20 +23,23 @@ class LoginController {
       return;
     }
 
-    const { _id, name, email, profilePhoto, midia } = user;
+    const { _id, username, email, profilePhoto, midia } = user;
 
-    const token = jwt.sign({ _id, name, email }, process.env.TOKEN_SECRET, {
+    const token = jwt.sign({ _id, username, email }, process.env.TOKEN_SECRET, {
       expiresIn: process.env.TOKEN_EXPIRATION,
     });
 
     res.cookie('token', token, {
       httpOnly: true,
       path: '/',
-      maxAge: 864000000,
+      maxAge: 31557600000, // esse cookie vai expirar em 1 ano
+      secure: true,
+      sameSite: 'None',
+      // domain: 'localhost:3000',
       // maxAge: new Date(Date.now() + 864000000)
     });
 
-    res.json({ login: 'success' });
+    res.json({ success: 'user logado.' });
   }
 }
 

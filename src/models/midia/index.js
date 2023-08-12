@@ -43,7 +43,7 @@ module.exports = class Midia {
       //   .limit(pageLimit)
       //   .populate({
       //     path: 'userId',
-      //     select: ['_id', 'name', 'email', 'profilePhoto'],
+      //     select: ['_id', 'username', 'email', 'profilePhoto'],
       //     populate: { path: 'profilePhoto', select: ['_id', 'url'] }
       //   });
 
@@ -121,7 +121,7 @@ module.exports = class Midia {
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -169,7 +169,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -217,7 +217,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -255,7 +255,7 @@ module.exports = class Midia {
       //   .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
       //   .populate({
       //     path: 'userId',
-      //     select: ['_id', 'name', 'profilePhoto'],
+      //     select: ['_id', 'username', 'profilePhoto'],
       //     populate: {
       //       path: 'profilePhoto',
       //       select: ['_id', 'url'],
@@ -343,7 +343,7 @@ module.exports = class Midia {
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -383,7 +383,7 @@ module.exports = class Midia {
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -423,7 +423,7 @@ module.exports = class Midia {
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -458,7 +458,7 @@ module.exports = class Midia {
         .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],

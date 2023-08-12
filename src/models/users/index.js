@@ -6,7 +6,7 @@ const { resolve } = require('path');
 const deleteObjectS3 = require('../../services/deleteObjectS3');
 
 const usersSchema = new Schema({
-  name: { type: String, required: true },
+  username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   profilePhoto: [{ type: Types.ObjectId, ref: 'ProfilePhotos' }],
   midia: [{ type: Types.ObjectId, require: false, ref: 'Midia' }],
@@ -29,6 +29,7 @@ module.exports = class Users {
 
       if (!this.user) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao pegar usuários.',
         });
@@ -38,6 +39,7 @@ module.exports = class Users {
       return this.user;
     } catch (err) {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -47,7 +49,8 @@ module.exports = class Users {
   async storeUser() {
     this.clearUpDataUser();
 
-    await this.userExist();
+    await this.userExistUsername();
+    await this.userExistEmail();
     if (this.errors.length) return;
 
     try {
@@ -55,6 +58,7 @@ module.exports = class Users {
 
       if (!this.user) {
         this.errors.push({
+          type: 'server',
           code: 500,
           msg: 'Erro ao criar usuário.',
         });
@@ -64,6 +68,7 @@ module.exports = class Users {
       return this.user;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -73,7 +78,7 @@ module.exports = class Users {
   async showUser(userId) {
     try {
       this.user = await UsersModel.findById(userId)
-        .select(['_id', 'name', 'email', 'profilePhoto', 'midia', 'createIn'])
+        .select(['_id', 'username', 'email', 'profilePhoto', 'midia', 'createIn'])
         .populate({
           path: 'profilePhoto',
           select: ['_id', 'url', 'userId'],
@@ -86,6 +91,7 @@ module.exports = class Users {
 
       if (!this.user) {
         this.errors.push({
+          type: 'server',
           code: 500,
           msg: 'Usuário não existe na base de dados.',
         });
@@ -95,6 +101,7 @@ module.exports = class Users {
       return this.user;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -107,7 +114,7 @@ module.exports = class Users {
     try {
       this.user = await UsersModel.findByIdAndUpdate(userId, this.body, { new: true }).select([
         '_id',
-        'name',
+        'username',
         'email',
         'midia',
         'createIn',
@@ -115,6 +122,7 @@ module.exports = class Users {
 
       if (!this.user) {
         this.errors.push({
+          type: 'server',
           code: 500,
           msg: 'Usuário não existe na base de dados.',
         });
@@ -124,6 +132,7 @@ module.exports = class Users {
       return this.user;
     } catch (err) {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -138,6 +147,7 @@ module.exports = class Users {
 
       if (!this.user) {
         this.errors.push({
+          type: 'server',
           code: 500,
           msg: 'Usuário não encontrado na base de dados.',
         });
@@ -151,6 +161,7 @@ module.exports = class Users {
         await deleteObjectS3(profilePhoto.path);
       } catch {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao deletar foto de perfil.',
         });
@@ -161,6 +172,7 @@ module.exports = class Users {
           await deleteObjectS3(midia.path);
         } catch {
           this.errors.push({
+            type: 'server',
             code: 400,
             msg: 'Erro ao deletar todas as publicações do perfil.',
           });
@@ -170,13 +182,14 @@ module.exports = class Users {
       return;
     } catch (err) {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
     }
   }
 
-  async userExist() {
+  async userExistEmail() {
     const { email } = this.body;
 
     try {
@@ -184,8 +197,9 @@ module.exports = class Users {
 
       if (this.user) {
         this.errors.push({
+          type: 'email',
           code: 400,
-          msg: 'Já existe um usuário com este email.',
+          msg: 'Já existe um usuário com este email. Tente novalmente com outro e-mail.',
         });
         return;
       }
@@ -193,6 +207,32 @@ module.exports = class Users {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async userExistUsername() {
+    const { username } = this.body;
+
+    try {
+      this.user = await UsersModel.findOne({ username });
+
+      if (this.user) {
+        this.errors.push({
+          type: 'username',
+          code: 400,
+          msg: 'Já existe um usuário com este username. Tente novalmente com outro username.',
+        });
+        return;
+      }
+
+      return;
+    } catch {
+      this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -201,7 +241,7 @@ module.exports = class Users {
 
   clearUpDataUser() {
     this.body = {
-      name: this.body.name ? this.body.name : undefined,
+      username: this.body.username ? this.body.username : undefined,
       email: this.body.email ? this.body.email : undefined,
       password: this.body.password ? this.body.password : undefined,
     };

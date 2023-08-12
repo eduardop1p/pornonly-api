@@ -71,6 +71,7 @@ class App {
           cb(console.error(`${origin} origem não permitida!`), false);
         }
       },
+      credentials: true, // para o server aceitar os cookies tenho que colocar credentials: true
     };
   }
 }

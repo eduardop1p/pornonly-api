@@ -1,4 +1,4 @@
-const { isEmail } = require('validator/validator');
+const { isEmail, isAlphanumeric, isLowercase } = require('validator/validator');
 
 const Users = require('../../models/users');
 const ValidatePassword = require('../../services/validatePassword');
@@ -10,7 +10,9 @@ class UsersController {
     const allUsers = await user.getAllUsers();
 
     if (user.errors.length) {
-      res.status(user.errors[0].code).json({ error: user.errors[0].msg });
+      res
+        .status(user.errors[0].code)
+        .json({ type: user.errors[0].type, error: user.errors[0].msg });
       return;
     }
 
@@ -20,19 +22,44 @@ class UsersController {
   async store(req, res) {
     const body = req.body;
 
-    const { name, email, password } = body;
+    const { username, email, password, repeatPassword } = body;
 
-    if (!name) {
-      return res.status(400).json({ error: `campo 'nome' é obrigatório.` });
+    if (username.length < 4 || username.length > 15) {
+      return res.status(400).json({
+        type: 'username',
+        error: 'Usuário deve ter ao menos 4 caracteres e no máximo 15.',
+      });
+    }
+    if (!isAlphanumeric(username) || !isLowercase(username)) {
+      return res.status(400).json({
+        type: 'username',
+        error: 'Usuário deve conter apenas letras minúsculas e números.',
+      });
     }
     if (!isEmail(email)) {
-      return res.status(400).json({ error: `'${email}' não é um email válido.` });
+      return res.status(400).json({ type: 'email', error: `'${email}' não é um email válido.` });
     }
-    const validate = new ValidatePassword(password);
-    if (validate.errors.length) {
-      res.status(400).json({ error: validate.errors[0] });
-      return;
+    if (password !== repeatPassword) {
+      return res.status(400).json({ type: 'email', error: 'As senhas não se coincidem.' });
     }
+    if (password.length < 5 || password.length > 20) {
+      return res
+        .status(400)
+        .json({ type: 'email', error: 'Senha deve ter ao menos 5 caracteres e no máximo 20.' });
+    }
+    const rgPassword = /[!@#$%^&*(),.?":{}|<>]/;
+    if (!rgPassword.test(password)) {
+      return res.status(400).json({
+        type: 'email',
+        error: 'Senha deve ter ao menos 1 caractere especial ex: @#$!*&%^.',
+      });
+    }
+
+    // const validate = new ValidatePassword(password);
+    // if (validate.errors.length) {
+    //   res.status(400).json({ type: 'password', error: validate.errors[0] });
+    //   return;
+    // }
 
     const user = new Users(body);
 
@@ -40,6 +67,7 @@ class UsersController {
 
     if (user.errors.length) {
       res.status(user.errors[0].code).json({
+        type: user.errors[0].type,
         error: user.errors[0].msg,
       });
       return;
@@ -61,11 +89,13 @@ class UsersController {
     const userInfo = await user.showUser(userId);
 
     if (user.errors.length) {
-      res.status(user.errors[0].code).json({ error: user.errors[0].msg });
+      res
+        .status(user.errors[0].code)
+        .json({ type: user.errors[0].type, error: user.errors[0].msg });
       return;
     }
 
-    // const { _id, name, email, midia, createIn } = userInfo;
+    // const { _id, username, email, midia, createIn } = userInfo;
 
     res.json(userInfo);
   }
@@ -80,9 +110,9 @@ class UsersController {
 
     const body = req.body;
 
-    const { name, email, password } = body;
+    const { username, email, password } = body;
 
-    if (!name) {
+    if (!username) {
       return res.status(400).json({ error: `campo 'nome' é obrigatório.` });
     }
     if (email && !isEmail(email)) {
@@ -100,7 +130,9 @@ class UsersController {
     const userInfo = await user.updateUser(userId);
 
     if (user.errors.length) {
-      res.status(user.errors[0].code).json({ error: user.errors[0].msg });
+      res
+        .status(user.errors[0].code)
+        .json({ type: user.errors[0].type, error: user.errors[0].msg });
       return;
     }
 
@@ -120,7 +152,9 @@ class UsersController {
     await user.deleteUser(userId);
 
     if (user.errors.length) {
-      res.status(user.errors[0].code).json({ error: user.errors[0].msg });
+      res
+        .status(user.errors[0].code)
+        .json({ type: user.errors[0].type, error: user.errors[0].msg });
       return;
     }
 

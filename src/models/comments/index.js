@@ -55,7 +55,7 @@ module.exports = class Comments {
         .select(['_id', 'comment', 'userId', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'name', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
