@@ -11,31 +11,22 @@ module.exports = class Login {
 
   async userLogin() {
     await this.userExist();
+    if (this.errors.length) return;
 
     try {
       const { email, password } = this.body;
 
-      const userEmail = await UsersModel.findOne({ email }).select(['_id', 'name', 'email']);
-      if (!userEmail) {
-        this.errors.push({
-          type: 'email',
-          code: 401,
-          msg: 'O E-mail que inserido não pertence a nenhuma conta.',
-        });
-        return;
-      }
-
-      const userPassword = await UsersModel.findOne({ password }).select(['_id', 'name', 'email']);
-      if (!userPassword) {
+      this.user = await UsersModel.findOne({ password }).select(['_id', 'name', 'email']);
+      if (!this.user) {
         this.errors.push({
           type: 'password',
           code: 401,
-          msg: 'A senha que você inseriu não está correta. Tenta novamente ou troque a senha.',
+          msg: 'A senha que você inseriu não está correta. Tente novamente ou troque a senha.',
         });
         return;
       }
 
-      return userEmail || userPassword;
+      return this.user;
     } catch (err) {
       this.errors.push({
         type: 'server',
@@ -51,11 +42,11 @@ module.exports = class Login {
     try {
       this.user = await UsersModel.findOne({ email });
 
-      if (this.user) {
+      if (!this.user) {
         this.errors.push({
           type: 'email',
           code: 400,
-          msg: 'Usuário não existe.',
+          msg: 'O E-mail inserido não pertence a nenhuma conta..',
         });
         return;
       }
