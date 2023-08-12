@@ -10,26 +10,35 @@ module.exports = class Login {
   }
 
   async userLogin() {
-    try {
-      this.user = await UsersModel.findOne({ ...this.body }).select([
-        '_id',
-        'name',
-        'email',
-        'profilePhoto',
-        'midia',
-      ]);
+    await this.userExist();
 
-      if (!this.user) {
+    try {
+      const { email, password } = this.body;
+
+      const userEmail = await UsersModel.findOne({ email }).select(['_id', 'name', 'email']);
+      if (!userEmail) {
         this.errors.push({
+          type: 'email',
           code: 401,
-          msg: 'E-mail ou senha incorreto.',
+          msg: 'O E-mail que inserido não pertence a nenhuma conta.',
         });
         return;
       }
 
-      return this.user;
+      const userPassword = await UsersModel.findOne({ password }).select(['_id', 'name', 'email']);
+      if (!userPassword) {
+        this.errors.push({
+          type: 'password',
+          code: 401,
+          msg: 'A senha que você inseriu não está correta. Tenta novamente ou troque a senha.',
+        });
+        return;
+      }
+
+      return userEmail || userPassword;
     } catch (err) {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -44,6 +53,7 @@ module.exports = class Login {
 
       if (this.user) {
         this.errors.push({
+          type: 'email',
           code: 400,
           msg: 'Usuário não existe.',
         });
@@ -53,6 +63,7 @@ module.exports = class Login {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });

@@ -8,7 +8,7 @@ class LoginController {
     const body = req.body;
 
     if (!isEmail(body.email)) {
-      res.status(400).json({ error: `'${body.email}' não é um email válido.` });
+      res.status(400).json({ type: 'email', error: `'${body.email}' não é um email válido.` });
       return;
     }
 
@@ -16,7 +16,9 @@ class LoginController {
     const user = await login.userLogin();
 
     if (login.errors.length) {
-      res.status(login.errors[0].code).json({ error: login.errors[0].msg });
+      res
+        .status(login.errors[0].code)
+        .json({ type: login.errors[0].type, error: login.errors[0].msg });
       return;
     }
 
