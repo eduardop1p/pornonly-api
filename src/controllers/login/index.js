@@ -26,7 +26,14 @@ class LoginController {
       expiresIn: process.env.TOKEN_EXPIRATION,
     });
 
-    res.json({ user: { _id, name, email, profilePhoto, midia, token } });
+    res.cookie('token', token, {
+      httpOnly: true,
+      path: '/',
+      maxAge: 864000000,
+      // maxAge: new Date(Date.now() + 864000000)
+    });
+
+    res.json({ login: 'success' });
   }
 }
 
