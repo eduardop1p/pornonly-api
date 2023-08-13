@@ -35,6 +35,7 @@ class LoginController {
       maxAge: 31557600000, // esse cookie vai expirar em 1 ano
       secure: true,
       sameSite: 'None',
+      priority: 'High',
       // domain: 'localhost:3000',
       // maxAge: new Date(Date.now() + 864000000)
     });
