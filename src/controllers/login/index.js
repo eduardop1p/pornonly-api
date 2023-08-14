@@ -23,9 +23,9 @@ class LoginController {
       return;
     }
 
-    const { _id, username, email, profilePhoto, midia } = user;
+    const { _id: id, username, email, profilePhoto, midia } = user;
 
-    const token = jwt.sign({ _id, username, email }, process.env.TOKEN_SECRET, {
+    const token = jwt.sign({ id, username, email }, process.env.TOKEN_SECRET, {
       expiresIn: process.env.TOKEN_EXPIRATION,
     });
 

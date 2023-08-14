@@ -15,16 +15,16 @@ module.exports = async function (req, res, next) {
   try {
     const data = jwt.verify(token, process.env.TOKEN_SECRET);
 
-    const { _id, email } = data;
+    const { id, email } = data;
 
-    // const user = await UsersModel.findById(_id).select(['_id']);
+    // const user = await UsersModel.findById(id).select(['id']);
 
     // if (!user) {
     //   res.status(401).json({ error: 'Usuário não existe na base de dados.' });
     //   return;
     // }
 
-    req.userId = _id;
+    req.userId = id;
     req.email = email;
 
     next();
