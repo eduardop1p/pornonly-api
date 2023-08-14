@@ -70,7 +70,7 @@ class App {
         if (allowList.indexOf(origin) !== -1 || !origin) {
           cb(null, true);
         } else {
-          cb(console.error(`${origin} origem não permitida!`), false);
+          cb(new Error(`${origin} origem não permitida!`), false); // para a origin não passar tenho que colocar um new Error()
         }
       },
       credentials: true, // para o server aceitar os cookies tenho que colocar credentials: true
