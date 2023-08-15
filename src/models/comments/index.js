@@ -77,6 +77,7 @@ module.exports = class Comments {
       return this.comment;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -89,6 +90,7 @@ module.exports = class Comments {
 
       if (!this.comment) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao deletar comentário.',
         });
@@ -98,6 +100,7 @@ module.exports = class Comments {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -110,6 +113,7 @@ module.exports = class Comments {
 
       if (!this.comment.deletedCount) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao deletar todos os comentários.',
         });
@@ -119,6 +123,7 @@ module.exports = class Comments {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -131,6 +136,7 @@ module.exports = class Comments {
 
       if (!this.midia) {
         this.errors.push({
+          type: 'server',
           code: 500,
           msh: 'Midia não existe na base de dados.',
         });
@@ -140,6 +146,7 @@ module.exports = class Comments {
       return this.midia;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msh: 'Erro interno no servidor.',
       });

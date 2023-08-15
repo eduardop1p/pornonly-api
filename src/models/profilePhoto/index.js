@@ -37,6 +37,7 @@ module.exports = class ProfilePhotos {
 
       if (!this.photo) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao adcionar foto de perfil.',
         });
@@ -48,6 +49,7 @@ module.exports = class ProfilePhotos {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -63,6 +65,7 @@ module.exports = class ProfilePhotos {
 
       if (!this.photo) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro foto de perfil não existe na base de dados.',
         });
@@ -73,6 +76,7 @@ module.exports = class ProfilePhotos {
         await deleteObjectS3(this.photo.path);
       } catch {
         this.errors.push({
+          type: 'server',
           code: 500,
           msg: 'Erro interno no servidor, tente deletar a foto novalmente.',
         });
@@ -84,6 +88,7 @@ module.exports = class ProfilePhotos {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -96,6 +101,7 @@ module.exports = class ProfilePhotos {
 
       if (!this.photo) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao pegar foto de usuário na base de dados.',
         });
@@ -105,6 +111,7 @@ module.exports = class ProfilePhotos {
       return this.photo;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -119,6 +126,7 @@ module.exports = class ProfilePhotos {
 
       if (!this.photo) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao pegar fotos de usuários na base de dados.',
         });
@@ -128,6 +136,7 @@ module.exports = class ProfilePhotos {
       return this.photo;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -140,6 +149,7 @@ module.exports = class ProfilePhotos {
 
       if (!this.user) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Usuário não existe na base de dados.',
         });
@@ -149,6 +159,7 @@ module.exports = class ProfilePhotos {
       return this.user;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });

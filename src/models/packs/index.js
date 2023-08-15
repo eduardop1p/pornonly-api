@@ -76,6 +76,7 @@ module.exports = class Packs {
       return this.pack;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -108,6 +109,7 @@ module.exports = class Packs {
       return this.pack;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -125,6 +127,7 @@ module.exports = class Packs {
 
       if (!this.pack) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao criar pack.',
         });
@@ -143,6 +146,7 @@ module.exports = class Packs {
     } catch (err) {
       console.log(err);
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -157,6 +161,7 @@ module.exports = class Packs {
 
       if (!midias.length) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro nenhuma publicação adcionada.',
         });
@@ -172,6 +177,7 @@ module.exports = class Packs {
     } catch (err) {
       console.log(err);
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -186,6 +192,7 @@ module.exports = class Packs {
 
       if (!midias.length) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro nenhuma publicação removida.',
         });
@@ -201,6 +208,7 @@ module.exports = class Packs {
     } catch (err) {
       console.log(err);
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -213,6 +221,7 @@ module.exports = class Packs {
 
       if (!this.pack) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro pack não existe na base de dados.',
         });
@@ -228,6 +237,7 @@ module.exports = class Packs {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -240,6 +250,7 @@ module.exports = class Packs {
 
       if (!this.pack.deletedCount) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro packs não existem na base de dados.',
         });
@@ -255,6 +266,7 @@ module.exports = class Packs {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -267,6 +279,7 @@ module.exports = class Packs {
 
       if (this.pack) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Já existe um pack com esse titulo, tente outro titulo.',
         });
@@ -276,6 +289,7 @@ module.exports = class Packs {
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });

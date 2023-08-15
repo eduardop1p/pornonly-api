@@ -40,17 +40,17 @@ class UsersController {
       return res.status(400).json({ type: 'email', error: `'${email}' não é um email válido.` });
     }
     if (password !== repeatPassword) {
-      return res.status(400).json({ type: 'email', error: 'As senhas não se coincidem.' });
+      return res.status(400).json({ type: 'password', error: 'As senhas não se coincidem.' });
     }
     if (password.length < 5 || password.length > 20) {
       return res
         .status(400)
-        .json({ type: 'email', error: 'Senha deve ter ao menos 5 caracteres e no máximo 20.' });
+        .json({ type: 'password', error: 'Senha deve ter ao menos 5 caracteres e no máximo 20.' });
     }
     const rgPassword = /[!@#$%^&*(),.?":{}|<>]/;
     if (!rgPassword.test(password)) {
       return res.status(400).json({
-        type: 'email',
+        type: 'password',
         error: 'Senha deve ter ao menos 1 caractere especial ex: @#$!*&%^.',
       });
     }
@@ -80,7 +80,9 @@ class UsersController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
@@ -104,25 +106,45 @@ class UsersController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
     const body = req.body;
 
-    const { username, email, password } = body;
+    const { username, email, password, repeatPassword } = body;
 
-    if (!username) {
-      return res.status(400).json({ error: `campo 'nome' é obrigatório.` });
+    if (username.length < 4 || username.length > 15) {
+      return res.status(400).json({
+        type: 'username',
+        error: 'Usuário deve ter ao menos 4 caracteres e no máximo 15.',
+      });
     }
-    if (email && !isEmail(email)) {
-      res.status(400).json({ error: `'${email}' não é um email válido.` });
-      return;
+    if (!isAlphanumeric(username) || !isLowercase(username)) {
+      return res.status(400).json({
+        type: 'username',
+        error: 'Usuário deve conter apenas letras minúsculas e números.',
+      });
     }
-    const validate = new ValidatePassword(password);
-    if (password && validate.errors.length) {
-      res.status(400).json({ error: validate.errors[0] });
-      return;
+    if (!isEmail(email)) {
+      return res.status(400).json({ type: 'email', error: `'${email}' não é um email válido.` });
+    }
+    if (password !== repeatPassword) {
+      return res.status(400).json({ type: 'password', error: 'As senhas não se coincidem.' });
+    }
+    if (password.length < 5 || password.length > 20) {
+      return res
+        .status(400)
+        .json({ type: 'password', error: 'Senha deve ter ao menos 5 caracteres e no máximo 20.' });
+    }
+    const rgPassword = /[!@#$%^&*(),.?":{}|<>]/;
+    if (!rgPassword.test(password)) {
+      return res.status(400).json({
+        type: 'password',
+        error: 'Senha deve ter ao menos 1 caractere especial ex: @#$!*&%^.',
+      });
     }
 
     const user = new Users(body);
@@ -143,7 +165,9 @@ class UsersController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 

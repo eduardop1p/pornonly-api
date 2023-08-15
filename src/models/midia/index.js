@@ -105,6 +105,7 @@ module.exports = class Midia {
     } catch (err) {
       console.log(err);
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -143,6 +144,7 @@ module.exports = class Midia {
       return this.midia;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -191,6 +193,7 @@ module.exports = class Midia {
       return this.midia;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -239,6 +242,7 @@ module.exports = class Midia {
       return this.midia;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -319,6 +323,7 @@ module.exports = class Midia {
       return this.midia;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -366,6 +371,7 @@ module.exports = class Midia {
     } catch (err) {
       // console.log(err);
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -406,6 +412,7 @@ module.exports = class Midia {
     } catch (err) {
       console.log(err);
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -446,6 +453,7 @@ module.exports = class Midia {
     } catch (err) {
       console.log(err);
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -467,6 +475,7 @@ module.exports = class Midia {
 
       if (!this.midia) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Midia não existe na base de dados',
         });
@@ -476,6 +485,7 @@ module.exports = class Midia {
       return this.midia;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -493,6 +503,7 @@ module.exports = class Midia {
 
       if (!this.midia) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao adcionar foto de usuário.',
         });
@@ -506,8 +517,9 @@ module.exports = class Midia {
       return;
     } catch (err) {
       this.errors.push({
+        type: 'server',
         code: 500,
-        msg: 'Erro interno no servidor.',
+        msg: 'Erro ao adcionar foto de usuário.',
       });
     }
   }
@@ -518,6 +530,7 @@ module.exports = class Midia {
 
       if (!this.midia) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Publicação não existe na base de dados.',
         });
@@ -536,14 +549,17 @@ module.exports = class Midia {
         await deleteObjectS3(this.midia.path);
       } catch {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Erro ao deletar publicação tente novalmente.',
         });
+        return;
       }
 
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -556,6 +572,7 @@ module.exports = class Midia {
 
       if (!this.midia.length) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Publicações não existem na base de dados.',
         });
@@ -574,14 +591,17 @@ module.exports = class Midia {
         });
       } catch {
         this.errors.push({
+          type: 'server',
           code: 500,
           msg: 'Erro interno no servidor, tente deletar as publicações novalmente.',
         });
+        return;
       }
 
       return;
     } catch {
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });
@@ -594,6 +614,7 @@ module.exports = class Midia {
 
       if (!this.user) {
         this.errors.push({
+          type: 'server',
           code: 400,
           msg: 'Usuário não existe na base de dados.',
         });
@@ -605,6 +626,7 @@ module.exports = class Midia {
       console.log(err);
 
       this.errors.push({
+        type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
       });

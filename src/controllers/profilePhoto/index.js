@@ -11,6 +11,7 @@ class ProfileController {
     return upload(req, res, async err => {
       if (err instanceof multer.MulterError) {
         res.status(400).json({
+          type: 'server',
           error: err.code == 'LIMIT_FILE_SIZE' ? 'Tamanho de arquivo não suportado.' : err.code,
         });
         return;
@@ -19,7 +20,9 @@ class ProfileController {
       const { userId } = req;
 
       if (!userId || typeof userId !== 'string') {
-        res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+        res
+          .status(401)
+          .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
         return;
       }
 
@@ -41,11 +44,14 @@ class ProfileController {
           await deleteObjectS3(path);
         } catch {
           res.status(500).json({
+            type: 'server',
             error: 'Erro interno no servidor tente novalmente.',
           });
           return;
         }
-        res.status(profilePhotos.errors[0].code).json({ error: profilePhotos.errors[0].msg });
+        res
+          .status(profilePhotos.errors[0].code)
+          .json({ type: 'server', error: profilePhotos.errors[0].msg });
         return;
       }
 
@@ -57,7 +63,9 @@ class ProfileController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
@@ -65,7 +73,9 @@ class ProfileController {
     const profilePhotosInfo = await profilePhotos.showProfilePhoto(userId);
 
     if (profilePhotos.errors.length) {
-      res.status(profilePhotos.errors[0].code).json({ error: profilePhotos.errors[0].msg });
+      res
+        .status(profilePhotos.errors[0].code)
+        .json({ type: 'server', error: profilePhotos.errors[0].msg });
       return;
     }
 
@@ -76,7 +86,9 @@ class ProfileController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
@@ -84,7 +96,9 @@ class ProfileController {
     await profilePhotos.deletePhotoMidia(userId);
 
     if (profilePhotos.errors.length) {
-      res.status(profilePhotos.errors[0].code).json({ error: profilePhotos.errors[0].msg });
+      res
+        .status(profilePhotos.errors[0].code)
+        .json({ type: profilePhotos.errors[0].type, error: profilePhotos.errors[0].msg });
       return;
     }
 
@@ -96,7 +110,9 @@ class ProfileController {
     const profilePhotosInfo = await profilePhotos.getAllProfilePhotos();
 
     if (profilePhotos.errors.length) {
-      res.status(profilePhotos.errors[0].code).json({ error: profilePhotos.errors[0].msg });
+      res
+        .status(profilePhotos.errors[0].code)
+        .json({ type: profilePhotos.errors[0].type, error: profilePhotos.errors[0].msg });
       return;
     }
 

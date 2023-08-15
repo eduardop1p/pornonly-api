@@ -6,11 +6,13 @@ class CommentsController {
     const { comment } = req.body;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
     if (!comment) {
-      res.status(400).json({ error: `campo 'comentario' é obrigatório.` });
+      res.status(400).json({ type: 'comment', error: `campo 'comentario' é obrigatório.` });
       return;
     }
 
@@ -25,7 +27,9 @@ class CommentsController {
     await comments.storeComment(midiaId);
 
     if (comments.errors.length) {
-      res.status(comments.errors[0].code).json({ error: comments.errors[0].msg });
+      res
+        .status(comments.errors[0].code)
+        .json({ type: comments.errors[0].type, error: comments.errors[0].msg });
       return;
     }
 
@@ -37,7 +41,7 @@ class CommentsController {
     const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
@@ -45,7 +49,9 @@ class CommentsController {
     const commentsInfo = await comments.getAllComments(midiaId, page);
 
     if (comments.errors.length) {
-      res.status(comments.errors[0].code).json({ error: comments.errors[0].msg });
+      res
+        .status(comments.errors[0].code)
+        .json({ type: comments.errors[0].type, error: comments.errors[0].msg });
       return;
     }
 
@@ -56,7 +62,9 @@ class CommentsController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
@@ -66,7 +74,9 @@ class CommentsController {
     await comments.deleteOneComment(commentId);
 
     if (comments.errors.length) {
-      res.status(comments.errors[0].code).json({ error: comments.errors[0].msg });
+      res
+        .status(comments.errors[0].code)
+        .json({ type: comments.errors[0].type, error: comments.errors[0].msg });
       return;
     }
 
@@ -77,7 +87,9 @@ class CommentsController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
@@ -85,7 +97,9 @@ class CommentsController {
     await comments.deleteAllComment(userId);
 
     if (comments.errors.length) {
-      res.status(comments.errors[0].code).json({ error: comments.errors[0].msg });
+      res
+        .status(comments.errors[0].code)
+        .json({ type: comments.errors[0].type, error: comments.errors[0].msg });
       return;
     }
 

@@ -13,6 +13,7 @@ class MidiaController {
     return upload(req, res, async err => {
       if (err instanceof multer.MulterError) {
         res.status(400).json({
+          type: 'server',
           error:
             err.code == 'LIMIT_FILE_SIZE'
               ? 'Arquivo com tamanho acima de 500MB não suportado.'
@@ -22,7 +23,7 @@ class MidiaController {
       }
 
       if (!req.file) {
-        res.status(400).json({ error: 'Erro desconhecido tente novalmente' });
+        res.status(400).json({ type: 'server', error: 'Erro desconhecido tente novalmente' });
         return;
       }
 
@@ -31,7 +32,9 @@ class MidiaController {
       const { userId } = req;
 
       if (!userId || typeof userId !== 'string') {
-        res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+        res
+          .status(401)
+          .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
         return;
       }
 
@@ -43,16 +46,18 @@ class MidiaController {
 
       const { title, description } = req.body;
 
-      if (title.length > 30) {
-        res
-          .status(400)
-          .json({ error: 'Titulo muito grande, tente um titulo com menos de 30 caracteres.' });
+      if (title.length > 100) {
+        res.status(400).json({
+          type: 'title',
+          error: 'Titulo muito grande, tente um titulo com menos de 100 caracteres.',
+        });
         return;
       }
 
       if (description.length > 100) {
         res.status(400).json({
-          error: 'Descrição muito grande, tente uma descrição com menos de 100 caracteres.',
+          type: 'description',
+          error: 'Descrição muito grande, tente uma descrição com menos de 500 caracteres.',
         });
         return;
       }
@@ -81,11 +86,14 @@ class MidiaController {
           await deleteObjectS3(path);
         } catch {
           res.status(500).json({
+            type: 'server',
             error: 'Erro interno no servidor tente novalmente.',
           });
           return;
         }
-        res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+        res
+          .status(midia.errors[0].code)
+          .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
         return;
       }
 
@@ -99,7 +107,7 @@ class MidiaController {
     const { apiKey, midiaId } = req.params;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
@@ -107,7 +115,9 @@ class MidiaController {
     const midiaInfo = await midia.showMidia(midiaId);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -119,7 +129,7 @@ class MidiaController {
     const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
@@ -128,7 +138,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaUsers(page);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -144,7 +156,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaUserId(userId, page);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -156,7 +170,7 @@ class MidiaController {
     const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
@@ -165,7 +179,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaPackId(packId, page);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -181,7 +197,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaPackNoId(page, userId);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -193,7 +211,7 @@ class MidiaController {
     const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
@@ -202,7 +220,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaType(midiaType, page);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -214,7 +234,7 @@ class MidiaController {
     const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
@@ -223,7 +243,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaDay(page);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -236,12 +258,14 @@ class MidiaController {
     const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
-    if (searchQuery.length > 30) {
-      res.status(400).json({ error: 'Tente uma pesquisa com menos de 30 caracteres.' });
+    if (searchQuery.length > 50) {
+      res
+        .status(400)
+        .json({ type: 'search', error: 'Tente uma pesquisa com menos de 50 caracteres.' });
       return;
     }
 
@@ -250,7 +274,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaSearchQuery(searchQuery, page);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -263,12 +289,12 @@ class MidiaController {
     const page = parseInt(req.query.page) || 1;
 
     if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ error: 'Acesso permitido somente para adms.' });
+      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
       return;
     }
 
     if (searchTags.length > 5) {
-      res.status(400).json({ error: 'Tente uma pesquisa com menos de 5 tags.' });
+      res.status(400).json({ type: 'tags', error: 'Tente uma pesquisa com menos de 5 tags.' });
       return;
     }
 
@@ -277,7 +303,9 @@ class MidiaController {
     const midiaInfo = await midia.getAllMidiaSearchTags(searchTags, page);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -288,7 +316,9 @@ class MidiaController {
     const { midiaId } = req.params;
 
     if (!midiaId || typeof midiaId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
@@ -297,7 +327,9 @@ class MidiaController {
     await midia.deleteOneMidia(midiaId);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 
@@ -310,7 +342,9 @@ class MidiaController {
     const { userId } = req;
 
     if (!userId || typeof userId !== 'string') {
-      res.status(401).json({ error: 'Faça login para ter permissão a essa funcionalidade.' });
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
       return;
     }
 
@@ -319,7 +353,9 @@ class MidiaController {
     await midia.deleteAllMidia(userId);
 
     if (midia.errors.length) {
-      res.status(midia.errors[0].code).json({ error: midia.errors[0].msg });
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
     }
 

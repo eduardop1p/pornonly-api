@@ -31,7 +31,7 @@ module.exports = class Login {
       this.errors.push({
         type: 'server',
         code: 500,
-        msg: 'Erro interno no servidor.',
+        msg: 'Erro ao fazer login. Tente novalmente',
       });
     }
   }
