@@ -83,6 +83,7 @@ module.exports = class Midia {
           $project: {
             _id: true,
             title: true,
+            midiaType: true,
             description: true,
             userId: true,
             url: true,
