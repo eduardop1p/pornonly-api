@@ -5,6 +5,8 @@ const Midia = require('../../models/midia');
 const multerConfig = require('../../config/multerMidia');
 const { imgsMimetypes, gifsMimetypes } = require('../../services/midiaMimetypes');
 const deleteObjectS3 = require('../../services/deleteObjectS3');
+const getVideoDimensions = require('../../config/getVideoDimensions');
+const getImageDimensions = require('../../config/getImageDimensions');
 
 const upload = multer(multerConfig).single('midia');
 
@@ -23,7 +25,7 @@ class MidiaController {
       }
 
       if (!req.file) {
-        res.status(400).json({ type: 'server', error: 'Erro desconhecido tente novalmente' });
+        res.status(400).json({ type: 'server', error: 'Erro desconhecido, tente novalmente.' });
         return;
       }
 
@@ -62,15 +64,24 @@ class MidiaController {
         return;
       }
 
+      // const videoMetada = await getVideoDimensions(req.file.location);
+      // const imageMetada = await getImageDimensions(req.file.location);
       const midiaType = midiaTypes();
       const tags = req.body.tags.trimEnd().split(' ');
       const path = key;
+      const midiaMetada =
+        midiaType === 'video'
+          ? await getVideoDimensions(`${process.env.CURRENT_DOMAIN}/${path}`)
+          : await getImageDimensions(`${process.env.CURRENT_DOMAIN}/${path}`);
       const url = `${process.env.CURRENT_DOMAIN}/${path}`;
+      const { width, height } = midiaMetada;
 
       const body = {
         title,
         description,
         midiaType,
+        width,
+        height,
         tags,
         userId,
         path,

@@ -10,6 +10,8 @@ const MidiaSchema = new Schema({
   title: { type: String, required: false, text: true, default: 'Nenhum titulo aqui.' },
   description: { type: String, default: 'Nenhum descrição para este titulo.' },
   midiaType: { type: String, require: true },
+  width: { type: String, require: true },
+  height: { type: String, require: true },
   tags: { type: Array },
   userId: [{ type: Types.ObjectId, ref: 'Users' }],
   packId: [{ type: Types.ObjectId, ref: 'Packs' }],
@@ -84,6 +86,8 @@ module.exports = class Midia {
             _id: true,
             title: true,
             midiaType: true,
+            width: true,
+            height: true,
             description: true,
             userId: true,
             url: true,
@@ -120,7 +124,18 @@ module.exports = class Midia {
 
     try {
       const results = await MidiaModel.find({ userId })
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .select([
+          '_id',
+          'title',
+          'description',
+          'midiaType',
+          'width',
+          'height',
+          'tags',
+          'userId',
+          'url',
+          'createIn',
+        ])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
@@ -164,6 +179,8 @@ module.exports = class Midia {
           'title',
           'description',
           'midiaType',
+          'width',
+          'height',
           'tags',
           'userId',
           'packId',
@@ -213,6 +230,8 @@ module.exports = class Midia {
           'title',
           'description',
           'midiaType',
+          'width',
+          'height',
           'tags',
           'userId',
           'packId',
@@ -302,6 +321,8 @@ module.exports = class Midia {
             title: true,
             description: true,
             midiaType: true,
+            width: true,
+            height: true,
             tags: true,
             userId: true,
             url: true,
@@ -346,7 +367,18 @@ module.exports = class Midia {
 
     try {
       const results = await MidiaModel.find({ createIn: { $gte: startDate, $lte: endDate } })
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .select([
+          '_id',
+          'title',
+          'description',
+          'midiaType',
+          'width',
+          'height',
+          'tags',
+          'userId',
+          'url',
+          'createIn',
+        ])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
@@ -387,7 +419,18 @@ module.exports = class Midia {
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchQuery } })
       const results = await MidiaModel.find({ title: { $regex: searchQuery, $options: 'i' } })
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .select([
+          '_id',
+          'title',
+          'description',
+          'midiaType',
+          'width',
+          'height',
+          'tags',
+          'userId',
+          'url',
+          'createIn',
+        ])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
@@ -428,7 +471,18 @@ module.exports = class Midia {
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
       const results = await MidiaModel.find({ tags: { $all: searchTags } })
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .select([
+          '_id',
+          'title',
+          'description',
+          'midiaType',
+          'width',
+          'height',
+          'tags',
+          'userId',
+          'url',
+          'createIn',
+        ])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
@@ -464,7 +518,18 @@ module.exports = class Midia {
   async showMidia(midiaId) {
     try {
       this.midia = await MidiaModel.findById(midiaId)
-        .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+        .select([
+          '_id',
+          'title',
+          'description',
+          'midiaType',
+          'width',
+          'height',
+          'tags',
+          'userId',
+          'url',
+          'createIn',
+        ])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
