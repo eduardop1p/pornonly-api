@@ -6,6 +6,7 @@ const axios = require('axios');
 const promisifiedExec = util.promisify(cp.exec);
 
 module.exports = async function getVideoDimensions(videoUrl) {
+  // atenção! este comando não irar funcionar se o caminho do terminal estiver com caracteris não aceitos, por exemplo espaçamentos
   const command = `${ffprobePath} -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "${videoUrl}"`;
 
   try {

@@ -20,8 +20,8 @@ class App {
     dotEnv.config(path.resolve(__dirname, '..', 'env'));
 
     this.middlewares();
-    this.routes();
     this.connectMongo();
+    this.routes();
   }
 
   middlewares() {
@@ -54,7 +54,6 @@ class App {
     try {
       await mongoose.connect(process.env.CONNECT_MONGO_STRING, {
         dbName: 'pornonlycloud',
-        socketTimeoutMS: 60000,
       });
     } catch (err) {
       // console.error(err);
