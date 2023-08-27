@@ -30,10 +30,10 @@ class UsersController {
         error: 'Usuário deve ter ao menos 4 caracteres e no máximo 15.',
       });
     }
-    if (!isAlphanumeric(username) || !isLowercase(username)) {
+    if (!username.match(/^[a-z0-9-_]*$/)) {
       return res.status(400).json({
         type: 'username',
-        error: 'Usuário deve conter apenas letras minúsculas e números.',
+        error: 'Usuário deve conter: letras minusculas, números e espaços apenas com ( - ou _ ).',
       });
     }
     if (!isEmail(email)) {

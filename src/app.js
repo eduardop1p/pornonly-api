@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const dotEnv = require('dotenv');
 const mongoose = require('mongoose');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 
 const homeRouter = require('./routes/home');
 const usersRouter = require('./routes/users');
@@ -17,6 +19,10 @@ const packsRouter = require('./routes/packs');
 class App {
   constructor() {
     this.app = express();
+    this.httpServer = createServer(this.app);
+    this.io = new Server(this.httpServer, {
+      cors: this.corsOptions(),
+    });
     dotEnv.config(path.resolve(__dirname, '..', 'env'));
 
     this.middlewares();
@@ -62,11 +68,12 @@ class App {
   }
 
   corsOptions() {
-    const allowList = ['http://localhost:3000'];
+    const allowListOrigin = ['http://localhost:3000'];
+
     return {
-      origin: function origin(origin, cb) {
+      origin: (origin, cb) => {
         // !origin para nossa api aceitar a origin do insominia
-        if (allowList.indexOf(origin) !== -1 || !origin) {
+        if (allowListOrigin.indexOf(origin) !== -1 || !origin) {
           cb(null, true);
         } else {
           cb(new Error(`${origin} origem não permitida!`), false); // para a origin não passar tenho que colocar um new Error()
@@ -76,5 +83,7 @@ class App {
     };
   }
 }
+const newApp = new App();
 
-module.exports = new App().app;
+module.exports.httpServer = newApp.httpServer;
+module.exports.io = newApp.io;
