@@ -37,7 +37,7 @@ class ProfileController {
       };
 
       const profilePhotos = new ProfilePhotos(body);
-      await profilePhotos.storeProfilePhoto(userId);
+      const profilePhoto = await profilePhotos.storeProfilePhoto(userId);
 
       if (profilePhotos.errors.length) {
         try {
@@ -55,7 +55,7 @@ class ProfileController {
         return;
       }
 
-      res.json({ success: 'Foto de perfil atualizada.' });
+      res.json({ success: 'Foto de perfil atualizada.', profilePhoto });
     });
   }
 

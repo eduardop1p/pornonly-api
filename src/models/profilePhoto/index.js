@@ -46,7 +46,7 @@ module.exports = class ProfilePhotos {
 
       await UsersModel.findByIdAndUpdate(userId, { profilePhoto: this.photo._id });
 
-      return;
+      return await ProfilePhotosModel.findById(this.photo._id).select(['_id', 'url']);
     } catch {
       this.errors.push({
         type: 'server',
