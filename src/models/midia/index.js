@@ -59,7 +59,7 @@ module.exports = class Midia {
             as: 'userId',
             pipeline: [
               {
-                $project: { _id: true, name: true, profilePhoto: true },
+                $project: { _id: true, username: true, profilePhoto: true },
               },
             ],
           },
