@@ -75,7 +75,59 @@ module.exports = class Users {
     }
   }
 
-  async showUser(usernameparam) {
+  async showUserId(userId) {
+    try {
+      this.user = await UsersModel.findById(userId)
+        .select(['_id', 'username', 'email', 'profilePhoto', 'midia', 'createIn'])
+        .populate({
+          path: 'profilePhoto',
+          select: ['_id', 'url', 'userId'],
+        })
+        .populate({
+          path: 'midia',
+          select: [
+            '_id',
+            'title',
+            'midiaType',
+            'width',
+            'height',
+            'description',
+            'tags',
+            'url',
+            'userId',
+            'createIn',
+          ],
+          options: { sort: { createIn: -1 } },
+          populate: {
+            path: 'userId',
+            select: ['_id', 'username', 'profilePhoto'],
+            populate: {
+              path: 'profilePhoto',
+              select: ['_id', 'url'],
+            },
+          },
+        });
+
+      if (!this.user) {
+        this.errors.push({
+          type: 'server',
+          code: 500,
+          msg: 'Usuário não existe na base de dados.',
+        });
+        return;
+      }
+
+      return this.user;
+    } catch {
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async showUserName(usernameparam) {
     try {
       this.user = await UsersModel.findOne({ username: usernameparam })
         .select(['_id', 'username', 'email', 'profilePhoto', 'midia', 'createIn'])

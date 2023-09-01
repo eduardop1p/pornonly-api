@@ -76,21 +76,38 @@ class UsersController {
     res.json({ success: 'Usuário criado com sucesso.' });
   }
 
-  async show(req, res) {
-    // const { userId } = req;
+  async showToUserId(req, res) {
+    const { userId } = req;
 
-    // if (!userId || typeof userId !== 'string') {
-    //   res
-    //     .status(401)
-    //     .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
-    //   return;
-    // }
+    if (!userId || typeof userId !== 'string') {
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
+      return;
+    }
 
+    const user = new Users();
+
+    const userInfo = await user.showUserId(userId);
+
+    if (user.errors.length) {
+      res
+        .status(user.errors[0].code)
+        .json({ type: user.errors[0].type, error: user.errors[0].msg });
+      return;
+    }
+
+    const { _id: id, username, email, profilePhoto, midia, createIn } = userInfo;
+
+    res.json({ id, username, email, profilePhoto, midia, createIn });
+  }
+
+  async showToUserName(req, res) {
     const { usernameparam } = req.params;
 
     const user = new Users();
 
-    const userInfo = await user.showUser(usernameparam);
+    const userInfo = await user.showUserName(usernameparam);
 
     if (user.errors.length) {
       res
