@@ -77,18 +77,20 @@ class UsersController {
   }
 
   async show(req, res) {
-    const { userId } = req;
+    // const { userId } = req;
 
-    if (!userId || typeof userId !== 'string') {
-      res
-        .status(401)
-        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
-      return;
-    }
+    // if (!userId || typeof userId !== 'string') {
+    //   res
+    //     .status(401)
+    //     .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
+    //   return;
+    // }
+
+    const { usernameparam } = req.params;
 
     const user = new Users();
 
-    const userInfo = await user.showUser(userId);
+    const userInfo = await user.showUser(usernameparam);
 
     if (user.errors.length) {
       res

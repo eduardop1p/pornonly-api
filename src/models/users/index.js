@@ -75,9 +75,9 @@ module.exports = class Users {
     }
   }
 
-  async showUser(userId) {
+  async showUser(usernameparam) {
     try {
-      this.user = await UsersModel.findById(userId)
+      this.user = await UsersModel.findOne({ username: usernameparam })
         .select(['_id', 'username', 'email', 'profilePhoto', 'midia', 'createIn'])
         .populate({
           path: 'profilePhoto',

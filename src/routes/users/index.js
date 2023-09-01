@@ -6,7 +6,8 @@ const loginRequired = require('../../middlewares/loginRequired');
 const router = Router();
 
 router.post('/', usersController.store);
-router.get('/', loginRequired, usersController.show);
+// router.get('/', loginRequired, usersController.show);
+router.get('/:usernameparam', usersController.show);
 router.put('/', loginRequired, usersController.update);
 // router.delete('/', loginRequired, usersController.delete);
 // router.get('/all', loginRequired, usersController.index);
