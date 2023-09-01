@@ -82,12 +82,12 @@ module.exports = class Users {
         .populate({
           path: 'profilePhoto',
           select: ['_id', 'url', 'userId'],
+        })
+        .populate({
+          path: 'midia',
+          select: ['_id', 'title', 'midiaType', 'description', 'tags', 'url', 'createIn'],
+          options: { sort: { createIn: -1 } },
         });
-      // .populate({
-      //   path: 'midia',
-      //   select: ['_id', 'title', 'midiaType', 'description', 'tags', 'url', 'createIn'],
-      //   options: { sort: { createIn: -1 } },
-      // });
 
       if (!this.user) {
         this.errors.push({
