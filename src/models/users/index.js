@@ -85,8 +85,16 @@ module.exports = class Users {
         })
         .populate({
           path: 'midia',
-          select: ['_id', 'title', 'midiaType', 'description', 'tags', 'url', 'createIn'],
+          select: ['_id', 'title', 'midiaType', 'description', 'tags', 'url', 'userId', 'createIn'],
           options: { sort: { createIn: -1 } },
+          populate: {
+            path: 'userId',
+            select: ['_id', 'username', 'profilePhoto'],
+            populate: {
+              path: 'profilePhoto',
+              select: ['_id', 'url'],
+            },
+          },
         });
 
       if (!this.user) {

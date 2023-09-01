@@ -13,7 +13,7 @@ const MidiaSchema = new Schema({
   width: { type: String, require: true },
   height: { type: String, require: true },
   tags: { type: Array },
-  userId: [{ type: Types.ObjectId, ref: 'Users' }],
+  userId: { type: Types.ObjectId, ref: 'Users' },
   packId: [{ type: Types.ObjectId, ref: 'Packs' }],
   path: { type: String, require: true },
   url: { type: String, require: true },
