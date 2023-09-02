@@ -97,9 +97,9 @@ class UsersController {
       return;
     }
 
-    const { _id: id, username, email, profilePhoto, midia, createIn } = userInfo;
+    const { _id, username, email, profilePhoto, midia, createIn } = userInfo;
 
-    res.json({ id, username, email, profilePhoto, midia, createIn });
+    res.json({ _id, username, email, profilePhoto, midia, createIn });
   }
 
   async showToUserName(req, res) {
@@ -116,9 +116,9 @@ class UsersController {
       return;
     }
 
-    const { _id: id, username, email, profilePhoto, midia, createIn } = userInfo;
+    const { _id, username, email, profilePhoto, midia, createIn } = userInfo;
 
-    res.json({ id, username, email, profilePhoto, midia, createIn });
+    res.json({ _id, username, email, profilePhoto, midia, createIn });
   }
 
   async update(req, res) {
