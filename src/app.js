@@ -68,7 +68,7 @@ class App {
   }
 
   corsOptions() {
-    const allowListOrigin = ['http://localhost:3000'];
+    const allowListOrigin = ['http://localhost:3000', 'https://pornonly-app-prototype.vercel.app'];
 
     return {
       origin: (origin, cb) => {

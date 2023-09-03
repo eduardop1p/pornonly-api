@@ -6,7 +6,7 @@ const { UsersModel } = require('../users');
 const deleteObjectS3 = require('../../services/deleteObjectS3');
 
 const ProfilePhotosSchema = new Schema({
-  userId: [{ type: Types.ObjectId, ref: 'Users' }],
+  userId: { type: Types.ObjectId, ref: 'Users' },
   url: { type: String },
   path: { type: String },
   createIn: { type: Date, default: Date.now },

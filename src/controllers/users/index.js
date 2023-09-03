@@ -97,17 +97,18 @@ class UsersController {
       return;
     }
 
-    const { _id, username, email, profilePhoto, midia, createIn } = userInfo;
+    const { _id, username, email, profilePhoto } = userInfo;
 
-    res.json({ _id, username, email, profilePhoto, midia, createIn });
+    res.json({ _id, username, email, profilePhoto });
   }
 
   async showToUserName(req, res) {
     const { usernameparam } = req.params;
+    const midiaPage = parseInt(req.query.midiaPage) || 1;
 
     const user = new Users();
 
-    const userInfo = await user.showUserName(usernameparam);
+    const userInfo = await user.showUserName(usernameparam, midiaPage);
 
     if (user.errors.length) {
       res
