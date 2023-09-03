@@ -104,11 +104,10 @@ class UsersController {
 
   async showToUserName(req, res) {
     const { usernameparam } = req.params;
-    const midiaPage = parseInt(req.query.midiaPage) || 1;
 
     const user = new Users();
 
-    const userInfo = await user.showUserName(usernameparam, midiaPage);
+    const userInfo = await user.showUserName(usernameparam);
 
     if (user.errors.length) {
       res
@@ -117,9 +116,9 @@ class UsersController {
       return;
     }
 
-    const { _id, username, email, profilePhoto, midia, createIn } = userInfo;
+    const { _id, username, email, profilePhoto, createIn } = userInfo;
 
-    res.json({ _id, username, email, profilePhoto, midia, createIn });
+    res.json({ _id, username, email, profilePhoto, createIn });
   }
 
   async update(req, res) {

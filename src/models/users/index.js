@@ -10,6 +10,7 @@ const usersSchema = new Schema({
   email: { type: String, required: true, unique: true },
   profilePhoto: [{ type: Types.ObjectId, ref: 'ProfilePhotos' }],
   midia: [{ type: Types.ObjectId, require: false, ref: 'Midia' }],
+  saves: [{ type: Types.ObjectId, require: false, ref: 'Saves' }],
   password: { type: String, required: true },
   createIn: { type: Date, default: Date.now },
 });
@@ -103,42 +104,57 @@ module.exports = class Users {
     }
   }
 
-  async showUserName(usernameparam, midiaPage) {
-    const pageLimit = 30;
-    const startIndex = (midiaPage - 1) * pageLimit; // startIndex vai ser o tanto de documentos a ser ignorados com o skip
-    const endIndex = midiaPage * pageLimit;
+  async showUserName(usernameparam) {
+    // const pageLimit = 30;
+    // const startIndex = (midiaPage - 1) * pageLimit; // startIndex vai ser o tanto de documentos a ser ignorados com o skip
+    // const endIndex = midiaPage * pageLimit;
 
     try {
       this.user = await UsersModel.findOne({ username: usernameparam })
-        .select(['_id', 'username', 'email', 'profilePhoto', 'midia', 'createIn'])
+        .select(['_id', 'username', 'email', 'profilePhoto', 'createIn'])
         .populate({
           path: 'profilePhoto',
           select: ['_id', 'url', 'userId'],
-        })
-        .populate({
-          path: 'midia',
-          select: [
-            '_id',
-            'title',
-            'midiaType',
-            'width',
-            'height',
-            'description',
-            'tags',
-            'url',
-            'userId',
-            'createIn',
-          ],
-          options: { skip: startIndex, limit: pageLimit, sort: { createIn: -1 } },
-          populate: {
-            path: 'userId',
-            select: ['_id', 'username', 'profilePhoto'],
-            populate: {
-              path: 'profilePhoto',
-              select: ['_id', 'url'],
-            },
-          },
         });
+      // .populate({
+      //   path: 'midia',
+      //   select: [
+      //     '_id',
+      //     'title',
+      //     'midiaType',
+      //     'width',
+      //     'height',
+      //     'description',
+      //     'tags',
+      //     'url',
+      //     'createIn',
+      //   ],
+      //   options: { skip: startIndex, limit: pageLimit, sort: { createIn: -1 } },
+      // })
+      // .populate({
+      //   path: 'saves',
+      //   select: [
+      //     '_id',
+      //     'title',
+      //     'midiaType',
+      //     'width',
+      //     'height',
+      //     'description',
+      //     'tags',
+      //     'url',
+      //     'userId',
+      //     'createIn',
+      //   ],
+      //   options: { skip: startIndex, limit: pageLimit, sort: { createIn: -1 } },
+      //   populate: {
+      //     path: 'userId',
+      //     select: ['_id', 'username', 'profilePhoto'],
+      //     populate: {
+      //       path: 'profilePhoto',
+      //       select: ['_id', 'url'],
+      //     },
+      //   },
+      // });
 
       if (!this.user) {
         this.errors.push({
@@ -149,22 +165,24 @@ module.exports = class Users {
         return;
       }
 
-      const total = this.user.midia.length;
-      const newUser = {
-        _id: this.user._id,
-        username: this.user.username,
-        email: this.user.email,
-        profilePhoto: this.user.profilePhoto,
-        profilePhoto: this.user.profilePhoto,
-        midia: {
-          results: [...this.user.midia],
-          currentPage: midiaPage,
-          totalPages: Math.ceil(total / pageLimit),
-          totalResults: total,
-        },
-        createIn: this.user.createIn,
-      };
-      return newUser;
+      // const total = this.user.midia.length;
+      // const newUser = {
+      //   _id: this.user._id,
+      //   username: this.user.username,
+      //   email: this.user.email,
+      //   profilePhoto: this.user.profilePhoto,
+      //   profilePhoto: this.user.profilePhoto,
+      //   midia: {
+      //     results: [...this.user.midia],
+      //     currentPage: midiaPage,
+      //     totalPages: Math.ceil(total / pageLimit),
+      //     totalResults: total,
+      //   },
+      //   saves: this.user.saves,
+      //   createIn: this.user.createIn,
+      // };
+
+      return this.user;
     } catch {
       this.errors.push({
         type: 'server',

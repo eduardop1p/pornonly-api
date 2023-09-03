@@ -132,18 +132,9 @@ module.exports = class Midia {
           'width',
           'height',
           'tags',
-          'userId',
           'url',
           'createIn',
         ])
-        .populate({
-          path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
-          populate: {
-            path: 'profilePhoto',
-            select: ['_id', 'url'],
-          },
-        })
         .skip(startIndex)
         .limit(pageLimit)
         .sort({ createIn: -1 });
@@ -606,9 +597,7 @@ module.exports = class Midia {
       const userId = this.midia.userId[0];
 
       this.user = await UsersModel.findById(userId);
-      this.user.midia = this.user.midia.filter(
-        id => id.toHexString() != this.midia._id.toHexString()
-      );
+      this.user.midia = this.user.midia.filter(id => id.toString() != this.midia._id.toString());
       await this.user.save();
 
       try {
