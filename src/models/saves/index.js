@@ -24,7 +24,7 @@ module.exports = class Saves {
 
     try {
       const results = await SavesModel.find({ userId })
-        .select(['_id', 'midia', 'userId', 'createIn'])
+        .select(['midia'])
         .populate({
           path: 'midia',
           select: [
