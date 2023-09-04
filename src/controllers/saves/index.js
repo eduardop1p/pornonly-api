@@ -23,7 +23,7 @@ class SavesController {
       return;
     }
 
-    res.json(allSaveUser);
+    res.json({ midia: allSaveUser });
   }
 
   async store(req, res) {
