@@ -127,7 +127,7 @@ class MidiaController {
       return;
     }
 
-    res.json({ midia: midiaInfo });
+    res.json(midiaInfo);
   }
 
   async index(req, res) {
