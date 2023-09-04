@@ -52,14 +52,14 @@ module.exports = class Saves {
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      if (!results.length) {
-        this.errors.push({
-          type: 'server',
-          code: 400,
-          msg: 'Nenhuma publicação salva.',
-        });
-        return;
-      }
+      // if (!results.length) {
+      //   this.errors.push({
+      //     type: 'server',
+      //     code: 400,
+      //     msg: 'Nenhuma publicação salva.',
+      //   });
+      //   return;
+      // }
 
       const total = results.length;
       this.save = {
