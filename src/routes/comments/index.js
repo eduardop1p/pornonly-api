@@ -6,7 +6,7 @@ const loginRequired = require('../../middlewares/loginRequired');
 const router = Router();
 
 // tem paginação com query styng: page
-router.get('/:midiaId/:apiKey', commentsController.index);
+router.get('/:midiaId', commentsController.index);
 
 router.post('/:midiaId', loginRequired, commentsController.store);
 router.delete('/delete-one/:commentId', loginRequired, commentsController.deleteOne);

@@ -115,12 +115,7 @@ class MidiaController {
   }
 
   async show(req, res) {
-    const { apiKey, midiaId } = req.params;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
+    const { midiaId } = req.params;
 
     const midia = new Midia();
     const midiaInfo = await midia.showMidia(midiaId);
@@ -136,13 +131,7 @@ class MidiaController {
   }
 
   async index(req, res) {
-    const { apiKey } = req.params;
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     const midia = new Midia();
 
@@ -177,13 +166,8 @@ class MidiaController {
   }
 
   async indexAllMidiaPackId(req, res) {
-    const { apiKey, packId } = req.params;
+    const { packId } = req.params;
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     const midia = new Midia();
 
@@ -218,13 +202,8 @@ class MidiaController {
   }
 
   async indexAllMidiaType(req, res) {
-    const { apiKey, midiaType } = req.params;
+    const { midiaType } = req.params;
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     const midia = new Midia();
 
@@ -241,13 +220,7 @@ class MidiaController {
   }
 
   async indexAllMidiaDay(req, res) {
-    const { apiKey } = req.params;
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     const midia = new Midia();
 
@@ -264,14 +237,8 @@ class MidiaController {
   }
 
   async indexSearch(req, res) {
-    const { apiKey } = req.params;
     const searchQuery = String(req.query.search_query) || '';
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     if (searchQuery.length > 50) {
       res
@@ -295,14 +262,8 @@ class MidiaController {
   }
 
   async indexSearchTags(req, res) {
-    const { apiKey } = req.params;
     const searchTags = req.query.search_tags.toLowerCase().split(',') || [];
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     if (searchTags.length > 5) {
       res.status(400).json({ type: 'tags', error: 'Tente uma pesquisa com menos de 5 tags.' });

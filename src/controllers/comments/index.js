@@ -37,13 +37,8 @@ class CommentsController {
   }
 
   async index(req, res) {
-    const { apiKey, midiaId } = req.params;
+    const { midiaId } = req.params;
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     const comments = new Comments();
     const commentsInfo = await comments.getAllComments(midiaId, page);

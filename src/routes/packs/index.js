@@ -7,7 +7,7 @@ const router = Router();
 
 // post pack é na rota midia
 
-router.get('/get-all-packs/:apiKey', packsController.index);
+router.get('/get-all-packs', packsController.index);
 
 router.post('/', loginRequired, packsController.store);
 router.get('/add-midia-inpack/:packId', loginRequired, packsController.storeMidiaInPack);

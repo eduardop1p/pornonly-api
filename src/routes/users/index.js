@@ -7,6 +7,7 @@ const router = Router();
 
 router.post('/', usersController.store);
 router.get('/:usernameparam', usersController.showToUserName);
+
 router.get('/', loginRequired, usersController.showToUserId);
 router.put('/', loginRequired, usersController.update);
 // router.delete('/', loginRequired, usersController.delete);

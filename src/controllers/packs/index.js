@@ -14,12 +14,10 @@ class PacksController {
     const { title, description } = req.body;
 
     if (title.length > 30) {
-      res
-        .status(400)
-        .json({
-          type: 'title',
-          error: 'Titulo muito grande, tente um titulo com menos de 30 caracteres.',
-        });
+      res.status(400).json({
+        type: 'title',
+        error: 'Titulo muito grande, tente um titulo com menos de 30 caracteres.',
+      });
       return;
     }
 
@@ -119,13 +117,7 @@ class PacksController {
   }
 
   async index(req, res) {
-    const { apiKey } = req.params;
     const page = parseInt(req.query.page) || 1;
-
-    if (apiKey !== process.env.API_KEY) {
-      res.status(401).json({ type: 'server', error: 'Acesso permitido somente para adms.' });
-      return;
-    }
 
     const packs = new Packs();
     const packsInfo = await packs.getAllPacks(page);
