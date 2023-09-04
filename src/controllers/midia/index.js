@@ -159,7 +159,7 @@ class MidiaController {
   }
 
   async indexAllMidiaUserId(req, res) {
-    const { userId } = req;
+    const { userId } = req.params;
     const page = parseInt(req.query.page) || 1;
 
     const midia = new Midia();
