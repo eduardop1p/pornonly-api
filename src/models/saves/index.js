@@ -63,7 +63,7 @@ module.exports = class Saves {
 
       const total = results.length;
       this.save = {
-        results,
+        results: results.map(obj => obj.midia),
         currentPage: page,
         totalPages: Math.ceil(total / pageLimit),
         totalResults: total,
