@@ -2,7 +2,7 @@ const Saves = require('../../models/saves');
 
 class SavesController {
   async index(req, res) {
-    const { userId } = req;
+    const { userId } = req.params;
     const page = parseInt(req.query.page) || 1;
 
     if (!userId || typeof userId !== 'string') {
