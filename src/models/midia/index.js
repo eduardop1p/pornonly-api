@@ -594,7 +594,7 @@ module.exports = class Midia {
         return;
       }
 
-      const userId = this.midia.userId[0];
+      const userId = this.midia.userId;
 
       this.user = await UsersModel.findById(userId);
       this.user.midia = this.user.midia.filter(id => id.toString() != this.midia._id.toString());
@@ -612,7 +612,7 @@ module.exports = class Midia {
       }
 
       return;
-    } catch {
+    } catch (err) {
       this.errors.push({
         type: 'server',
         code: 500,
