@@ -17,7 +17,7 @@ router.get('/get-all-midia-userid/:userId', midiaController.indexAllMidiaUserId)
 
 router.get('/get-all-midia-packsnoid', loginRequired, midiaController.indexAllMidiaPackNoId);
 router.post('/', loginRequired, midiaController.store);
-router.delete('/delete-one/:midiaId', loginRequired, midiaController.deleteOne);
+router.delete('/delete', loginRequired, midiaController.delete);
 router.delete('/delete-all', loginRequired, midiaController.deleteAll);
 
 module.exports = router;

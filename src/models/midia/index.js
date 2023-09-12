@@ -581,37 +581,43 @@ module.exports = class Midia {
     }
   }
 
-  async deleteOneMidia(midiaId) {
+  async deleteMidia(midiaIds) {
     try {
-      this.midia = await MidiaModel.findByIdAndDelete(midiaId).select(['_id', 'path', 'userId']);
+      let errorInLoop = false;
+      midiaIds.forEach(async midiaId => {
+        if (errorInLoop) return;
+        this.midia = await MidiaModel.findByIdAndDelete(midiaId).select(['_id', 'path', 'userId']);
 
-      if (!this.midia) {
-        this.errors.push({
-          type: 'server',
-          code: 400,
-          msg: 'Publicação não existe na base de dados.',
-        });
+        if (!this.midia) {
+          this.errors.push({
+            type: 'server',
+            code: 400,
+            msg: 'Publicação não existe na base de dados.',
+          });
+          errorInLoop = true;
+          return;
+        }
+
+        const userId = this.midia.userId;
+
+        this.user = await UsersModel.findById(userId);
+        this.user.midia = this.user.midia.filter(id => id.toString() != this.midia._id.toString());
+        await this.user.save();
+
+        try {
+          await deleteObjectS3(this.midia.path);
+        } catch {
+          this.errors.push({
+            type: 'server',
+            code: 400,
+            msg: 'Erro ao deletar publicação tente novalmente.',
+          });
+          errorInLoop = true;
+          return;
+        }
+
         return;
-      }
-
-      const userId = this.midia.userId;
-
-      this.user = await UsersModel.findById(userId);
-      this.user.midia = this.user.midia.filter(id => id.toString() != this.midia._id.toString());
-      await this.user.save();
-
-      try {
-        await deleteObjectS3(this.midia.path);
-      } catch {
-        this.errors.push({
-          type: 'server',
-          code: 400,
-          msg: 'Erro ao deletar publicação tente novalmente.',
-        });
-        return;
-      }
-
-      return;
+      });
     } catch (err) {
       this.errors.push({
         type: 'server',

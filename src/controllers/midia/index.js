@@ -284,19 +284,13 @@ class MidiaController {
     res.json({ midia: midiaInfo });
   }
 
-  async deleteOne(req, res) {
-    const { midiaId } = req.params;
-
-    if (!midiaId || typeof midiaId !== 'string') {
-      res
-        .status(401)
-        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
-      return;
-    }
+  async delete(req, res) {
+    const midiaIds = req.query.midiaIds ? req.query.midiaIds.split(',') : [];
+    if (!midiaIds.length) return res.send();
 
     const midia = new Midia();
 
-    await midia.deleteOneMidia(midiaId);
+    await midia.deleteMidia(midiaIds);
 
     if (midia.errors.length) {
       res
