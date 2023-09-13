@@ -584,7 +584,7 @@ module.exports = class Midia {
   async deleteMidia(midiaDelete, userId) {
     try {
       const midiaDeleteIds = midiaDelete.map(midiaId => midiaId.id);
-      const midiaDeletePaths = midiaDelete.map(midiaId => ({ Key: midiaId.path }));
+      const midiaDeletePaths = midiaDelete.map(midiaId => ({ Key: midiaId.key }));
 
       this.midia = await MidiaModel.deleteMany({ _id: { $in: midiaDeleteIds } });
 
