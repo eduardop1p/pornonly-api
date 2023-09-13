@@ -1,5 +1,6 @@
 const multer = require('multer');
 const { resolve } = require('path');
+const { get } = require('lodash');
 
 const Midia = require('../../models/midia');
 const multerConfig = require('../../config/multerMidia');
@@ -285,12 +286,21 @@ class MidiaController {
   }
 
   async delete(req, res) {
-    const midiaIds = req.query.midiaIds ? req.query.midiaIds.split(',') : [];
-    if (!midiaIds.length) return res.send();
+    let midiaDelete = req.query.midiaDelete;
+    if (!midiaDelete) return res.send();
+    try {
+      midiaDelete = JSON.parse(midiaDelete);
+    } catch {
+      return res.status(500).json({
+        type: 'server',
+        error: 'Erro ao processar resposta',
+      });
+    }
+    const { userId } = req;
 
     const midia = new Midia();
 
-    await midia.deleteMidia(midiaIds);
+    await midia.deleteMidia(midiaDelete, userId);
 
     if (midia.errors.length) {
       res

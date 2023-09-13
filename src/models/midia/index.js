@@ -581,43 +581,38 @@ module.exports = class Midia {
     }
   }
 
-  async deleteMidia(midiaIds) {
+  async deleteMidia(midiaDelete, userId) {
     try {
-      let errorInLoop = false;
-      midiaIds.forEach(async midiaId => {
-        if (errorInLoop) return;
-        this.midia = await MidiaModel.findByIdAndDelete(midiaId).select(['_id', 'path', 'userId']);
+      const midiaDeleteIds = midiaDelete.map(midiaId => midiaId.id);
+      const midiaDeletePaths = midiaDelete.map(midiaId => ({ Key: midiaId.path }));
 
-        if (!this.midia) {
-          this.errors.push({
-            type: 'server',
-            code: 400,
-            msg: 'Publicação não existe na base de dados.',
-          });
-          errorInLoop = true;
-          return;
-        }
+      this.midia = await MidiaModel.deleteMany({ _id: { $in: midiaDeleteIds } });
 
-        const userId = this.midia.userId;
-
-        this.user = await UsersModel.findById(userId);
-        this.user.midia = this.user.midia.filter(id => id.toString() != this.midia._id.toString());
-        await this.user.save();
-
-        try {
-          await deleteObjectS3(this.midia.path);
-        } catch {
-          this.errors.push({
-            type: 'server',
-            code: 400,
-            msg: 'Erro ao deletar publicação tente novalmente.',
-          });
-          errorInLoop = true;
-          return;
-        }
-
+      if (!this.midia.acknowledged) {
+        this.errors.push({
+          type: 'server',
+          code: 400,
+          msg: 'Publicação não existe na base de dados.',
+        });
         return;
-      });
+      }
+
+      this.user = await UsersModel.findById(userId);
+      this.user.midia = this.user.midia.filter(id => id.toString() != this.midia._id.toString());
+      await this.user.save();
+
+      try {
+        await deleteObjectS3(midiaDeletePaths);
+      } catch {
+        this.errors.push({
+          type: 'server',
+          code: 400,
+          msg: 'Erro ao deletar publicações tente novalmente.',
+        });
+        return;
+      }
+
+      return;
     } catch (err) {
       this.errors.push({
         type: 'server',
