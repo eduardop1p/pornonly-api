@@ -586,6 +586,8 @@ module.exports = class Midia {
       const midiaDeleteIds = midiaDelete.map(midiaId => midiaId.id);
       const midiaDeletePaths = midiaDelete.map(midiaId => ({ Key: midiaId.key }));
 
+      this.user = await UsersModel.findById(userId);
+
       this.midia = await MidiaModel.deleteMany({ _id: { $in: midiaDeleteIds } });
 
       if (!this.midia.acknowledged) {
@@ -598,7 +600,9 @@ module.exports = class Midia {
       }
 
       this.user = await UsersModel.findById(userId);
-      this.user.midia = this.user.midia.filter(id => id.toString() != this.midia._id.toString());
+      this.user.midia = this.user.midia.filter(
+        midiaId => !midiaDeleteIds.includes(midiaId.toString())
+      );
       await this.user.save();
 
       try {
@@ -614,6 +618,7 @@ module.exports = class Midia {
 
       return;
     } catch (err) {
+      console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,
