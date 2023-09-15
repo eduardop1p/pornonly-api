@@ -523,7 +523,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto', 'saves'],
+          select: ['_id', 'username', 'profilePhoto', 'midia', 'saves'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
