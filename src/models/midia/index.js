@@ -523,7 +523,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'saves'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -590,7 +590,7 @@ module.exports = class Midia {
 
       this.midia = await MidiaModel.deleteMany({ _id: { $in: midiaDeleteIds } });
 
-      if (!this.midia.acknowledged) {
+      if (!this.midia.deletedCount) {
         this.errors.push({
           type: 'server',
           code: 400,
