@@ -4,7 +4,7 @@ const { MidiaModel } = require('../midia');
 
 const CommentsSchema = new Schema({
   comment: { type: String, required: false },
-  userId: [{ type: Types.ObjectId, ref: 'Users' }],
+  userId: { type: Types.ObjectId, ref: 'Users' },
   midiaId: [{ type: Types.ObjectId, ref: 'Midia' }],
   createIn: { type: Date, default: Date.now },
 });
