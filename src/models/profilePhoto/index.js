@@ -57,10 +57,8 @@ module.exports = class ProfilePhotos {
   }
 
   async deletePhotoMidia(userId) {
-    await this.userExist(userId);
-    if (this.errors.length) return;
-
     try {
+      this.user = await UsersModel.findById(userId);
       this.photo = await ProfilePhotosModel.findOneAndDelete({ userId });
 
       if (!this.photo) {
@@ -73,7 +71,7 @@ module.exports = class ProfilePhotos {
       }
 
       try {
-        await deleteObjectS3(this.photo.path);
+        await deleteObjectS3([{ Key: this.photo.path }]);
       } catch {
         this.errors.push({
           type: 'server',
@@ -86,7 +84,8 @@ module.exports = class ProfilePhotos {
       await this.user.save();
 
       return;
-    } catch {
+    } catch (err) {
+      // console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,
