@@ -8,6 +8,7 @@ const CommentsSchema = new Schema({
     likes: { type: Number, required: false, default: 0 },
     users: [{ type: Types.ObjectId, ref: 'Users' }],
   },
+  responses: [{ type: Types.ObjectId, ref: 'ResponsesComments' }],
   userId: { type: Types.ObjectId, ref: 'Users' },
   midiaId: [{ type: Types.ObjectId, ref: 'Midia' }],
   createIn: { type: Date, default: Date.now },
@@ -86,7 +87,7 @@ module.exports = class Comments {
         this.errors.push({
           type: 'server',
           code: 400,
-          msg: 'Você ainda não deub like neste comentário',
+          msg: 'Você ainda não deu like neste comentário',
         });
         return;
       }
@@ -119,13 +120,26 @@ module.exports = class Comments {
 
     try {
       const results = await CommentsModel.find({ midiaId })
-        .select(['_id', 'comment', 'likes', 'userId', 'createIn'])
+        .select(['_id', 'comment', 'likes', 'responses', 'userId', 'createIn'])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
+          },
+        })
+        .populate({
+          path: 'responses',
+          select: ['response', 'userId', 'commentId', 'createIn'],
+          options: { sort: { createIn: 1 } },
+          populate: {
+            path: 'userId',
+            select: ['_id', 'username', 'profilePhoto'],
+            populate: {
+              path: 'profilePhoto',
+              select: ['_id', 'url'],
+            },
           },
         })
         .skip(startIndex)
