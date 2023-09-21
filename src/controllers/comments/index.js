@@ -33,7 +33,49 @@ class CommentsController {
       return;
     }
 
-    res.json({ success: 'commentário adcionado.' });
+    res.json({ success: 'Comentário adcionado.' });
+  }
+
+  async storeLikeInComment(req, res) {
+    const { commentId } = req.params;
+    const { userId } = req;
+
+    if (!commentId) {
+      return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
+    }
+
+    const comments = new Comments();
+    await comments.storeCommentLike(userId, commentId);
+
+    if (comments.errors.length) {
+      res
+        .status(comments.errors[0].code)
+        .json({ type: comments.errors[0].type, error: comments.errors[0].msg });
+      return;
+    }
+
+    res.json({ success: 'Comentário adcionado like.' });
+  }
+
+  async unclickLikeInComment(req, res) {
+    const { commentId } = req.params;
+    const { userId } = req;
+
+    if (!commentId) {
+      return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
+    }
+
+    const comments = new Comments();
+    await comments.unclickCommentLike(userId, commentId);
+
+    if (comments.errors.length) {
+      res
+        .status(comments.errors[0].code)
+        .json({ type: comments.errors[0].type, error: comments.errors[0].msg });
+      return;
+    }
+
+    res.json({ success: 'Comentário removido o like.' });
   }
 
   async index(req, res) {

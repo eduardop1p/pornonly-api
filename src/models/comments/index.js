@@ -4,6 +4,10 @@ const { MidiaModel } = require('../midia');
 
 const CommentsSchema = new Schema({
   comment: { type: String, required: false },
+  likes: {
+    likes: { type: Number, required: false, default: 0 },
+    users: [{ type: Types.ObjectId, ref: 'Users' }],
+  },
   userId: { type: Types.ObjectId, ref: 'Users' },
   midiaId: [{ type: Types.ObjectId, ref: 'Midia' }],
   createIn: { type: Date, default: Date.now },
@@ -36,7 +40,70 @@ module.exports = class Comments {
     } catch {
       this.errors.push({
         code: 500,
-        msh: 'Erro interno no servidor.',
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async storeCommentLike(userId, commentId) {
+    try {
+      this.comment = await CommentsModel.findById(commentId);
+      if (!this.comment) {
+        this.errors.push({
+          type: 'server',
+          code: 500,
+          msg: 'Comentário não encontrado',
+        });
+        return;
+      }
+
+      this.comment.likes.likes = parseInt(this.comment.likes.likes + 1);
+      this.comment.likes.users.push(Types.ObjectId.createFromHexString(userId));
+      await this.comment.save();
+      return;
+    } catch (err) {
+      console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor',
+      });
+    }
+  }
+
+  async unclickCommentLike(userId, commentId) {
+    try {
+      this.comment = await CommentsModel.findById(commentId);
+      if (!this.comment) {
+        this.errors.push({
+          type: 'server',
+          code: 500,
+          msg: 'Comentário não encontrado',
+        });
+        return;
+      }
+      if (!this.comment.likes.users.includes(userId.toString())) {
+        this.errors.push({
+          type: 'server',
+          code: 400,
+          msg: 'Você ainda não deub like neste comentário',
+        });
+        return;
+      }
+
+      this.comment.likes.likes = parseInt(this.comment.likes.likes - 1);
+      this.comment.likes.users = this.comment.likes.users.filter(
+        id => id.toString() !== userId.toString()
+      );
+      await this.comment.save();
+
+      return;
+    } catch (err) {
+      // console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor',
       });
     }
   }
@@ -52,7 +119,7 @@ module.exports = class Comments {
 
     try {
       const results = await CommentsModel.find({ midiaId })
-        .select(['_id', 'comment', 'userId', 'createIn'])
+        .select(['_id', 'comment', 'likes', 'userId', 'createIn'])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
