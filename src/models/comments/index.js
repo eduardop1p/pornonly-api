@@ -57,6 +57,7 @@ module.exports = class Comments {
         });
         return;
       }
+      if (this.comment.likes.users.includes(userId.toString())) return;
 
       this.comment.likes.likes = parseInt(this.comment.likes.likes + 1);
       this.comment.likes.users.push(Types.ObjectId.createFromHexString(userId));
@@ -83,14 +84,7 @@ module.exports = class Comments {
         });
         return;
       }
-      if (!this.comment.likes.users.includes(userId.toString())) {
-        this.errors.push({
-          type: 'server',
-          code: 400,
-          msg: 'Você ainda não deu like neste comentário',
-        });
-        return;
-      }
+      if (!this.comment.likes.users.includes(userId.toString())) return;
 
       this.comment.likes.likes = parseInt(this.comment.likes.likes - 1);
       this.comment.likes.users = this.comment.likes.users.filter(
