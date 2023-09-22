@@ -62,6 +62,9 @@ module.exports = class ResponsesComments {
         });
         return;
       }
+      const commet = await CommentsModel.findById(commentId);
+      commet.responses = commet.responses.filter(id => id.toString() != responseId.toString());
+      await commet.save();
 
       return;
     } catch (err) {
