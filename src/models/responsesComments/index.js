@@ -3,13 +3,13 @@ const { Types, Schema, model } = require('mongoose');
 const { CommentsModel } = require('../comments');
 
 const ResponsesCommentsSchema = new Schema({
-  response: { type: String, required: false },
+  comment: { type: String, required: false },
   userId: { type: Types.ObjectId, ref: 'Users', required: false },
-  commentId: { type: Types.ObjectId, ref: 'Comments', required: false },
   likes: {
     likes: { type: Number, required: false, default: 0 },
     users: [{ type: Types.ObjectId, ref: 'Users' }],
   },
+  commentId: { type: Types.ObjectId, ref: 'Comments', required: false },
   createIn: { type: Date, default: Date.now },
 });
 
@@ -81,9 +81,9 @@ module.exports = class ResponsesComments {
     }
   }
 
-  async storeCommentLike(userId, commentId) {
+  async storeCommentLike(userId, responseId) {
     try {
-      this.comment = await ResponsesCommentsModel.findById(commentId);
+      this.comment = await ResponsesCommentsModel.findById(responseId);
       if (!this.comment) {
         this.errors.push({
           type: 'server',
@@ -108,9 +108,9 @@ module.exports = class ResponsesComments {
     }
   }
 
-  async unclickCommentLike(userId, commentId) {
+  async unclickCommentLike(userId, responseId) {
     try {
-      this.comment = await ResponsesCommentsModel.findById(commentId);
+      this.comment = await ResponsesCommentsModel.findById(responseId);
       if (!this.comment) {
         this.errors.push({
           type: 'server',

@@ -4,12 +4,12 @@ class ControllerResponsesComments {
   async store(req, res) {
     const { commentId } = req.params;
     const { userId } = req;
-    const { response } = req.body;
+    const { comment } = req.body;
     if (!commentId) {
       return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
     }
 
-    if (response.length > 50) {
+    if (comment.length > 50) {
       return res.status(400).json({
         type: 'server',
         msg: 'Comentário muito grande, tente com menos de 50 caracteris',
@@ -19,7 +19,7 @@ class ControllerResponsesComments {
     const body = {
       userId,
       commentId,
-      response,
+      comment,
     };
     const comments = new ResponsesComments(body);
     await comments.storeResponseComment();
@@ -55,15 +55,15 @@ class ControllerResponsesComments {
   }
 
   async storeLikeInComment(req, res) {
-    const { commentId } = req.params;
+    const { responseId } = req.params;
     const { userId } = req;
 
-    if (!commentId) {
+    if (!responseId) {
       return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
     }
 
     const comments = new ResponsesComments();
-    await comments.storeCommentLike(userId, commentId);
+    await comments.storeCommentLike(userId, responseId);
 
     if (comments.errors.length) {
       res
@@ -76,15 +76,15 @@ class ControllerResponsesComments {
   }
 
   async unclickLikeInComment(req, res) {
-    const { commentId } = req.params;
+    const { responseId } = req.params;
     const { userId } = req;
 
-    if (!commentId) {
+    if (!responseId) {
       return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
     }
 
     const comments = new ResponsesComments();
-    await comments.unclickCommentLike(userId, commentId);
+    await comments.unclickCommentLike(userId, responseId);
 
     if (comments.errors.length) {
       res
