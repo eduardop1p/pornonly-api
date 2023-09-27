@@ -42,7 +42,6 @@ module.exports = class ResponsesComments {
 
       return;
     } catch (err) {
-      // console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,
@@ -138,3 +137,5 @@ module.exports = class ResponsesComments {
     }
   }
 };
+
+module.exports.ResponsesCommentsModel = ResponsesCommentsModel;

@@ -1,4 +1,4 @@
-const { Schema, model, Types } = require('mongoose');
+const { Schema, model, Types, models } = require('mongoose');
 
 const { MidiaModel } = require('../midia');
 
@@ -188,6 +188,7 @@ module.exports = class Comments {
   async deleteOneComment(commentId) {
     try {
       this.comment = await CommentsModel.findByIdAndDelete(commentId);
+      await models.ResponsesComments.deleteMany({ commentId });
 
       if (!this.comment) {
         this.errors.push({
@@ -199,7 +200,8 @@ module.exports = class Comments {
       }
 
       return;
-    } catch {
+    } catch (err) {
+      console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,
