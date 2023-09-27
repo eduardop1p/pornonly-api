@@ -24,7 +24,7 @@ class CommentsController {
     };
 
     const comments = new Comments(body);
-    await comments.storeComment(midiaId);
+    const commentCreated = await comments.storeComment(midiaId);
 
     if (comments.errors.length) {
       res
@@ -33,7 +33,7 @@ class CommentsController {
       return;
     }
 
-    res.json({ success: 'Comentário adcionado.' });
+    res.json(commentCreated);
   }
 
   async storeLikeInComment(req, res) {

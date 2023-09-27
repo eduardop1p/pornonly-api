@@ -10,7 +10,7 @@ const CommentsSchema = new Schema({
   },
   responses: [{ type: Types.ObjectId, ref: 'ResponsesComments' }],
   userId: { type: Types.ObjectId, ref: 'Users' },
-  midiaId: [{ type: Types.ObjectId, ref: 'Midia' }],
+  midiaId: { type: Types.ObjectId, ref: 'Midia' },
   createIn: { type: Date, default: Date.now },
 });
 
@@ -38,6 +38,32 @@ module.exports = class Comments {
         });
         return;
       }
+
+      const showComment = await CommentsModel.findById(this.comment._id)
+        .select(['_id', 'comment', 'likes', 'responses', 'userId', 'createIn'])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'username', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
+        .populate({
+          path: 'responses',
+          select: ['_id', 'comment', 'userId', 'likes', 'createIn'],
+          options: { sort: { createIn: 1 } },
+          populate: {
+            path: 'userId',
+            select: ['_id', 'username', 'profilePhoto'],
+            populate: {
+              path: 'profilePhoto',
+              select: ['_id', 'url'],
+            },
+          },
+        });
+
+      return showComment;
     } catch {
       this.errors.push({
         code: 500,

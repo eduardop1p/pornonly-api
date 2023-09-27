@@ -65,6 +65,7 @@ class App {
       await mongoose.connect(process.env.CONNECT_MONGO_STRING, {
         dbName: 'pornonlycloud',
       });
+      console.log('Conectado a base de dados.');
     } catch (err) {
       // console.error(err);
       console.error('Erro ao conectar-se na base de dados.');
