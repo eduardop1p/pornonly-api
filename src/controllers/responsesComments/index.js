@@ -9,10 +9,10 @@ class ControllerResponsesComments {
       return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
     }
 
-    if (comment.length > 50) {
+    if (comment.length > 100) {
       return res.status(400).json({
         type: 'server',
-        msg: 'Comentário muito grande, tente com menos de 50 caracteris',
+        msg: 'Comentário muito grande, tente com menos de 100 caracteres',
       });
     }
 
