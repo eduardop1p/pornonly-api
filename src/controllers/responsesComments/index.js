@@ -22,7 +22,7 @@ class ControllerResponsesComments {
       comment,
     };
     const comments = new ResponsesComments(body);
-    await comments.storeResponseComment();
+    const showResponse = await comments.storeResponseComment();
 
     if (comments.errors.length) {
       res
@@ -31,7 +31,7 @@ class ControllerResponsesComments {
       return;
     }
 
-    res.json({ success: 'Resposta adcionada ao comentário.' });
+    res.json(showResponse);
   }
 
   async delete(req, res) {

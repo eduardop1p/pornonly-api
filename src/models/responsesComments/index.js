@@ -28,6 +28,7 @@ module.exports = class ResponsesComments {
 
       this.response = await ResponsesCommentsModel.create(this.body);
       const comment = await CommentsModel.findById(commentId);
+
       if (!comment) {
         this.errors.push({
           type: 'server',
@@ -40,8 +41,21 @@ module.exports = class ResponsesComments {
       comment.responses.push(this.response._id);
       await comment.save();
 
-      return;
+      const showResponse = await ResponsesCommentsModel.findById(this.response._id)
+        .select(['_id', 'comment', 'userId', 'likes', 'createIn'])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'username', 'profilePhoto'],
+          options: { sort: { createIn: 1 } },
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        });
+
+      return showResponse;
     } catch (err) {
+      console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,
