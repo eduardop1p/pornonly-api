@@ -4,7 +4,7 @@ class ControllerResponsesComments {
   async store(req, res) {
     const { commentId } = req.params;
     const { userId } = req;
-    const { comment } = req.body;
+    const { comment, userNameResponse } = req.body;
     if (!commentId) {
       return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
     }
@@ -19,6 +19,7 @@ class ControllerResponsesComments {
     const body = {
       userId,
       commentId,
+      userNameResponse,
       comment,
     };
     const comments = new ResponsesComments(body);

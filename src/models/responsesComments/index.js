@@ -5,6 +5,7 @@ const { CommentsModel } = require('../comments');
 const ResponsesCommentsSchema = new Schema({
   comment: { type: String, required: false },
   userId: { type: Types.ObjectId, ref: 'Users', required: false },
+  userNameResponse: { type: String, required: false, default: '' },
   likes: {
     likes: { type: Number, required: false, default: 0 },
     users: [{ type: Types.ObjectId, ref: 'Users' }],
@@ -42,7 +43,7 @@ module.exports = class ResponsesComments {
       await comment.save();
 
       const showResponse = await ResponsesCommentsModel.findById(this.response._id)
-        .select(['_id', 'comment', 'userId', 'likes', 'createIn'])
+        .select(['_id', 'comment', 'userId', 'userNameResponse', 'likes', 'createIn'])
         .populate({
           path: 'userId',
           select: ['_id', 'username', 'profilePhoto'],
@@ -55,7 +56,7 @@ module.exports = class ResponsesComments {
 
       return showResponse;
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,

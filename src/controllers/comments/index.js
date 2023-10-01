@@ -15,6 +15,10 @@ class CommentsController {
       res.status(400).json({ type: 'comment', error: `campo 'comentario' é obrigatório.` });
       return;
     }
+    if (comment.length > 100) {
+      res.status(400).json({ type: 'comment', error: 'Comentário muito grande' });
+      return;
+    }
 
     const { midiaId } = req.params;
     const body = {

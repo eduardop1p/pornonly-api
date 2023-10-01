@@ -51,7 +51,7 @@ module.exports = class Comments {
         })
         .populate({
           path: 'responses',
-          select: ['_id', 'comment', 'userId', 'likes', 'createIn'],
+          select: ['_id', 'comment', 'userId', 'userNameResponse', 'likes', 'createIn'],
           options: { sort: { createIn: 1 } },
           populate: {
             path: 'userId',
@@ -151,7 +151,7 @@ module.exports = class Comments {
         })
         .populate({
           path: 'responses',
-          select: ['_id', 'comment', 'userId', 'likes', 'createIn'],
+          select: ['_id', 'comment', 'userId', 'userNameResponse', 'likes', 'createIn'],
           options: { sort: { createIn: 1 } },
           populate: {
             path: 'userId',
