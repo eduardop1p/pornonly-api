@@ -16,6 +16,8 @@ router.get('/get-all-midia-day', midiaController.indexAllMidiaDay);
 router.get('/get-all-midia-userid/:userId', midiaController.indexAllMidiaUserId);
 
 router.get('/get-all-midia-packsnoid', loginRequired, midiaController.indexAllMidiaPackNoId);
+router.get('/like-in-comment/:midiaId', loginRequired, midiaController.storeLikeInComment);
+router.delete('/unclick-in-comment/:midiaId', loginRequired, midiaController.unclickLikeInComment);
 router.post('/', loginRequired, midiaController.store);
 router.delete('/delete', loginRequired, midiaController.delete);
 router.delete('/delete-all', loginRequired, midiaController.deleteAll);

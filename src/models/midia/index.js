@@ -11,6 +11,10 @@ const MidiaSchema = new Schema({
   description: { type: String, default: 'Nenhum descrição para este titulo.' },
   midiaType: { type: String, require: true },
   width: { type: String, require: true },
+  likes: {
+    likes: { type: Number, required: false, default: 0 },
+    users: [{ type: Types.ObjectId, ref: 'Users' }],
+  },
   height: { type: String, require: true },
   tags: { type: Array },
   userId: { type: Types.ObjectId, ref: 'Users' },
@@ -402,6 +406,63 @@ module.exports = class Midia {
     }
   }
 
+  async storeCommentLike(userId, midiaId) {
+    try {
+      this.midia = await MidiaModel.findById(midiaId);
+      if (!this.midia) {
+        this.errors.push({
+          type: 'server',
+          code: 500,
+          msg: 'Pin não encontrado',
+        });
+        return;
+      }
+      if (this.midia.likes.users.includes(userId.toString())) return;
+
+      this.midia.likes.likes = parseInt(this.midia.likes.likes + 1);
+      this.midia.likes.users.push(Types.ObjectId.createFromHexString(userId));
+      await this.midia.save();
+      return;
+    } catch (err) {
+      console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor',
+      });
+    }
+  }
+
+  async unclickCommentLike(userId, midiaId) {
+    try {
+      this.midia = await MidiaModel.findById(midiaId);
+      if (!this.midia) {
+        this.errors.push({
+          type: 'server',
+          code: 500,
+          msg: 'Comentário não encontrado',
+        });
+        return;
+      }
+      if (!this.midia.likes.users.includes(userId.toString())) return;
+
+      this.midia.likes.likes = parseInt(this.midia.likes.likes - 1);
+      this.midia.likes.users = this.midia.likes.users.filter(
+        id => id.toString() !== userId.toString()
+      );
+      await this.midia.save();
+
+      return;
+    } catch (err) {
+      // console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor',
+      });
+    }
+  }
+
   async getAllMidiaSearchQuery(searchQuery, page) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
@@ -458,10 +519,13 @@ module.exports = class Midia {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
+    const regexArray = searchTags.map(tag => new RegExp(tag, 'i'));
+    console.log(searchTags);
+    console.log(searchTags.filter(v => v.includes('riva')));
 
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
-      const results = await MidiaModel.find({ tags: { $all: searchTags } })
+      const results = await MidiaModel.find()
         .select([
           '_id',
           'title',
@@ -514,6 +578,7 @@ module.exports = class Midia {
           'title',
           'description',
           'midiaType',
+          'likes',
           'width',
           'height',
           'tags',

@@ -148,6 +148,48 @@ class MidiaController {
     res.json({ midia: midiaInfo });
   }
 
+  async storeLikeInComment(req, res) {
+    const { midiaId } = req.params;
+    const { userId } = req;
+
+    if (!midiaId) {
+      return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
+    }
+
+    const midia = new Midia();
+    await midia.storeCommentLike(userId, midiaId);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ success: 'Pin adcionado like.' });
+  }
+
+  async unclickLikeInComment(req, res) {
+    const { midiaId } = req.params;
+    const { userId } = req;
+
+    if (!midiaId) {
+      return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
+    }
+
+    const midia = new Midia();
+    await midia.unclickCommentLike(userId, midiaId);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ success: 'Pin removido like.' });
+  }
+
   async indexAllMidiaUserId(req, res) {
     const { userId } = req.params;
     const page = parseInt(req.query.page) || 1;
