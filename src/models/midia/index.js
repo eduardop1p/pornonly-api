@@ -520,12 +520,12 @@ module.exports = class Midia {
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
     const regexArray = searchTags.map(tag => new RegExp(tag, 'i'));
-    console.log(searchTags);
-    console.log(searchTags.filter(v => v.includes('riva')));
 
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
-      const results = await MidiaModel.find()
+      const results = await MidiaModel.find({
+        $or: regexArray.map(regex => ({ tags: { $regex: regex } })),
+      })
         .select([
           '_id',
           'title',
