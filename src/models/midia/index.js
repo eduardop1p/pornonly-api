@@ -516,14 +516,15 @@ module.exports = class Midia {
   }
 
   async getAllMidiaSearchTags(searchTags, page) {
+    if (!searchTags.join()) return;
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
     const arrayRegex = searchTags.map(tag => ({ tags: { $in: new RegExp(`${tag}?`, 'i') } }));
-    const arrayRegex2 = searchTags.map(tag => ({
-      tags: { $in: new RegExp(tag.slice(0, -1), 'i') },
-    }));
-    const arrRegexquery = [...arrayRegex, ...arrayRegex2];
+    // const arrayRegex2 = searchTags.map(tag => ({
+    //   tags: { $in: new RegExp(tag.slice(0, -1), 'i') },
+    // }));
+    // const arrRegexquery = [...arrayRegex, ...arrayRegex2];
     // console.log(arrayRegex);
 
     try {
