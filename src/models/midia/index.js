@@ -361,7 +361,8 @@ module.exports = class Midia {
     const endDate = new Date().toLocaleDateString('en-ca');
 
     try {
-      const results = await MidiaModel.find({ createIn: { $gte: startDate, $lte: endDate } })
+      // const results = await MidiaModel.find({ createIn: { $gte: startDate, $lte: endDate } })
+      const results = await MidiaModel.find()
         .select([
           '_id',
           'title',

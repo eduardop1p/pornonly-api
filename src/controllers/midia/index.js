@@ -29,8 +29,8 @@ class MidiaController {
         res.status(400).json({ type: 'server', error: 'Erro desconhecido, tente novalmente.' });
         return;
       }
-      const contentLength = Buffer.byteLength(req.file)
-      res.apppend('Content-Length', contentLength);
+      // const contentLength = Buffer.byteLength(req.file);
+      // res.apppend('Content-Length', contentLength);
 
       const { mimetype, key } = req.file;
 
