@@ -521,41 +521,94 @@ module.exports = class Midia {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
-    const arrayRegex = searchTags.map(tag => ({ tags: { $in: new RegExp(`${tag}?`, 'i') } }));
+    const arrayRegex = searchTags.map(tag => ({ tags: { $regex: new RegExp(`${tag}?`, 'i') } }));
     // const arrayRegex2 = searchTags.map(tag => ({
     //   tags: { $in: new RegExp(tag.slice(0, -1), 'i') },
     // }));
     // const arrRegexquery = [...arrayRegex, ...arrayRegex2];
-    // console.log(arrayRegex);
 
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
-      const results = await MidiaModel.find({
-        $or: arrayRegex,
-      })
-        .select([
-          '_id',
-          'title',
-          'description',
-          'midiaType',
-          'width',
-          'height',
-          'tags',
-          'userId',
-          'url',
-          'createIn',
-        ])
-        .populate({
-          path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
-          populate: {
-            path: 'profilePhoto',
-            select: ['_id', 'url'],
+      // const results = await MidiaModel.find({
+      //   $or: arrayRegex,
+      // })
+      //   .select([
+      //     '_id',
+      //     'title',
+      //     'description',
+      //     'midiaType',
+      //     'width',
+      //     'height',
+      //     'tags',
+      //     'userId',
+      //     'url',
+      //     'createIn',
+      //   ])
+      //   .populate({
+      //     path: 'userId',
+      //     select: ['_id', 'username', 'profilePhoto'],
+      //     populate: {
+      //       path: 'profilePhoto',
+      //       select: ['_id', 'url'],
+      //     },
+      //   })
+      //   .skip(startIndex)
+      //   .limit(pageLimit)
+      //   .sort({ createIn: -1 });
+      const results = await MidiaModel.aggregate([
+        {
+          $match: {
+            $or: arrayRegex,
           },
-        })
-        .skip(startIndex)
-        .limit(pageLimit)
-        .sort({ createIn: -1 });
+        },
+        {
+          $lookup: {
+            from: UsersModel.collection.name,
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userId',
+            pipeline: [
+              {
+                $project: { _id: true, username: true, profilePhoto: true },
+              },
+            ],
+          },
+        },
+        { $unwind: { path: '$userId' } },
+        {
+          $lookup: {
+            from: ProfilePhotosModel.collection.name,
+            localField: 'userId.profilePhoto',
+            foreignField: '_id',
+            as: 'userId.profilePhoto',
+            pipeline: [
+              {
+                $project: {
+                  _id: true,
+                  url: true,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $project: {
+            _id: true,
+            title: true,
+            midiaType: true,
+            tags: true,
+            width: true,
+            height: true,
+            description: true,
+            userId: true,
+            url: true,
+            createIn: true,
+          },
+        },
+        { $sample: { size: pageLimit } },
+        { $skip: startIndex },
+        { $limit: pageLimit },
+      ]);
 
       const total = results.length;
 
