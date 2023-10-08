@@ -383,6 +383,24 @@ class MidiaController {
       success: 'Todas as publicação foram deletadas com sucesso.',
     });
   }
+
+  async showMidiaTitles(req, res) {
+    const { search_query } = req.query;
+    if (!search_query) return res.json({ titlesMidia: [] });
+
+    const midia = new Midia();
+
+    const midiaTitles = await midia.showAllMidiaTitles(search_query);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ titlesMidia: midiaTitles });
+  }
 }
 
 module.exports = new MidiaController();

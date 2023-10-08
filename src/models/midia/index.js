@@ -34,6 +34,10 @@ module.exports = class Midia {
     this.errors = [];
   }
 
+  escapedStrint(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   async getAllMidiaUsers(page) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
@@ -471,7 +475,12 @@ module.exports = class Midia {
 
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchQuery } })
-      const results = await MidiaModel.find({ title: { $regex: searchQuery, $options: 'i' } })
+      const results = await MidiaModel.find({
+        $or: [
+          { title: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
+          { tags: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
+        ],
+      })
         .select([
           '_id',
           'title',
@@ -521,7 +530,9 @@ module.exports = class Midia {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
-    const arrayRegex = searchTags.map(tag => ({ tags: { $regex: new RegExp(`${tag}?`, 'i') } }));
+    const arrayRegex = searchTags.map(tag => ({
+      tags: { $regex: new RegExp(`${this.escapedStrint(tag)}?`, 'i') },
+    }));
     // const arrayRegex2 = searchTags.map(tag => ({
     //   tags: { $in: new RegExp(tag.slice(0, -1), 'i') },
     // }));
@@ -811,6 +822,28 @@ module.exports = class Midia {
     } catch (err) {
       console.log(err);
 
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async showAllMidiaTitles(search_query) {
+    try {
+      const results = await MidiaModel.find({
+        $or: [
+          { title: { $regex: new RegExp(`${this.escapedStrint(search_query)}?`, 'i') } },
+          // { tags: { $regex: new RegExp(`${search_query}?`, 'i') } },
+        ],
+      })
+        .select(['title'])
+        .limit(10);
+
+      return results;
+    } catch (err) {
+      console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,
