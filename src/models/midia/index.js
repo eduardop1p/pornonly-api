@@ -58,7 +58,7 @@ module.exports = class Midia {
       //   });
 
       // consulta aleatória com todos os parametros acima mais com aggregate e $sample
-      const results = await MidiaModel.aggregate([
+      const resultsDb = await MidiaModel.aggregate([
         {
           $lookup: {
             from: UsersModel.collection.name,
@@ -102,10 +102,12 @@ module.exports = class Midia {
             createIn: true,
           },
         },
-        { $sample: { size: pageLimit } },
+        // { $sample: { size: pageLimit } },
         { $skip: startIndex },
         { $limit: pageLimit },
       ]);
+
+      const results = resultsDb.sort(() => Math.random() - 0.5);
 
       this.midia = {
         results,
@@ -288,9 +290,9 @@ module.exports = class Midia {
       //   .limit(pageLimit)
       //   .sort({ createIn: -1 });
 
-      const results = await MidiaModel.aggregate([
+      const resultsDb = await MidiaModel.aggregate([
         { $match: { midiaType } },
-        { $sample: { size: pageLimit } },
+        // { $sample: { size: pageLimit } },
         {
           $lookup: {
             from: UsersModel.collection.name,
@@ -332,6 +334,7 @@ module.exports = class Midia {
         { $limit: pageLimit },
       ]);
 
+      const results = resultsDb.sort(() => Math.random() - 0.5);
       const total = results.length;
 
       this.midia = {
@@ -566,7 +569,7 @@ module.exports = class Midia {
       //   .skip(startIndex)
       //   .limit(pageLimit)
       //   .sort({ createIn: -1 });
-      const results = await MidiaModel.aggregate([
+      const resultsDb = await MidiaModel.aggregate([
         {
           $match: {
             $or: arrayRegex,
@@ -616,11 +619,12 @@ module.exports = class Midia {
             createIn: true,
           },
         },
-        { $sample: { size: pageLimit } },
+        // { $sample: { size: pageLimit } },
         { $skip: startIndex },
         { $limit: pageLimit },
       ]);
 
+      const results = resultsDb.sort(() => Math.random() - 0.5);
       const total = results.length;
 
       this.midia = {

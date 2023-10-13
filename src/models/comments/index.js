@@ -133,7 +133,7 @@ module.exports = class Comments {
     await this.midiaExist(midiaId);
     if (this.errors.length) return;
 
-    const pageLimit = 25;
+    const pageLimit = 5;
 
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
@@ -166,7 +166,9 @@ module.exports = class Comments {
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      const total = results.length;
+      const allCommentsPin = await CommentsModel.find({ midiaId });
+      const total =
+        allCommentsPin.length + allCommentsPin.reduce((ac, vl) => ac + vl.responses.length, 0);
 
       this.comment = {
         results,

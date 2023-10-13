@@ -1,6 +1,7 @@
 const multer = require('multer');
 const { resolve } = require('path');
 const { get } = require('lodash');
+const { decode } = require('jsonwebtoken');
 
 const Midia = require('../../models/midia');
 const multerConfig = require('../../config/multerMidia');
@@ -135,6 +136,7 @@ class MidiaController {
 
   async index(req, res) {
     const page = parseInt(req.query.page) || 1;
+    const preferences = req.query.preferences || '';
 
     const midia = new Midia();
 
