@@ -133,7 +133,7 @@ module.exports = class Comments {
     await this.midiaExist(midiaId);
     if (this.errors.length) return;
 
-    const pageLimit = 5;
+    const pageLimit = 20;
 
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
