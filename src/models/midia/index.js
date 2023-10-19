@@ -5,6 +5,7 @@ const { resolve } = require('path');
 const { UsersModel } = require('../users');
 const { ProfilePhotosModel } = require('../profilePhoto');
 const deleteObjectS3 = require('../../services/deleteObjectS3');
+const { SavesModel } = require('../../models/saves');
 
 const MidiaSchema = new Schema({
   title: { type: String, required: false, text: true, default: 'Nenhum titulo aqui.' },
@@ -38,76 +39,102 @@ module.exports = class Midia {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  async getAllMidiaUsers(page) {
+  async getAllMidiaUsers(page, midiaType, order) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
 
     try {
       const total = await MidiaModel.countDocuments();
+      const orderBy = () => {
+        if (order === 'popular') return { likes: -1 };
+        if (order === 'desc') return { createIn: -1 };
+        if (order === 'asc') return { createIn: 1 };
 
-      // const results = await MidiaModel.find() // tras os resultados em ordem crescente com sort 1
-      //   .select(['_id', 'title', 'description', 'userId', 'url', 'createIn'])
-      //   .sort({ createIn: 1 })
-      //   .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
-      //   .limit(pageLimit)
-      //   .populate({
-      //     path: 'userId',
-      //     select: ['_id', 'username', 'email', 'profilePhoto'],
-      //     populate: { path: 'profilePhoto', select: ['_id', 'url'] }
-      //   });
+        return undefined;
+      };
+
+      const results = await MidiaModel.find({
+        midiaType: midiaType ? midiaType : { $exists: true },
+      }) // tras os resultados em ordem crescente com sort 1
+        .select([
+          '_id',
+          'title',
+          'description',
+          'userId',
+          'url',
+          'midiaType',
+          'likes',
+          ,
+          'height',
+          'width',
+          'createIn',
+        ])
+        .sort(orderBy())
+        .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
+        .limit(pageLimit)
+        .populate({
+          path: 'userId',
+          select: ['_id', 'username', 'email', 'profilePhoto'],
+          populate: { path: 'profilePhoto', select: ['_id', 'url'] },
+        });
 
       // consulta aleatória com todos os parametros acima mais com aggregate e $sample
-      const resultsDb = await MidiaModel.aggregate([
-        {
-          $lookup: {
-            from: UsersModel.collection.name,
-            localField: 'userId',
-            foreignField: '_id',
-            as: 'userId',
-            pipeline: [
-              {
-                $project: { _id: true, username: true, profilePhoto: true },
-              },
-            ],
-          },
-        },
-        { $unwind: { path: '$userId' } },
-        {
-          $lookup: {
-            from: ProfilePhotosModel.collection.name,
-            localField: 'userId.profilePhoto',
-            foreignField: '_id',
-            as: 'userId.profilePhoto',
-            pipeline: [
-              {
-                $project: {
-                  _id: true,
-                  url: true,
-                },
-              },
-            ],
-          },
-        },
-        {
-          $project: {
-            _id: true,
-            title: true,
-            midiaType: true,
-            width: true,
-            height: true,
-            description: true,
-            userId: true,
-            url: true,
-            createIn: true,
-          },
-        },
-        // { $sample: { size: pageLimit } },
-        { $skip: startIndex },
-        { $limit: pageLimit },
-      ]);
+      // const resultsDb = await MidiaModel.aggregate([
+      //   {
+      //     $match: {
+      //       midiaType: midiaType ? midiaType : { $exists: true },
+      //     },
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: UsersModel.collection.name,
+      //       localField: 'userId',
+      //       foreignField: '_id',
+      //       as: 'userId',
+      //       pipeline: [
+      //         {
+      //           $project: { _id: true, username: true, profilePhoto: true },
+      //         },
+      //       ],
+      //     },
+      //   },
+      //   { $unwind: { path: '$userId' } },
+      //   {
+      //     $lookup: {
+      //       from: ProfilePhotosModel.collection.name,
+      //       localField: 'userId.profilePhoto',
+      //       foreignField: '_id',
+      //       as: 'userId.profilePhoto',
+      //       pipeline: [
+      //         {
+      //           $project: {
+      //             _id: true,
+      //             url: true,
+      //           },
+      //         },
+      //       ],
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: true,
+      //       title: true,
+      //       midiaType: true,
+      //       width: true,
+      //       height: true,
+      //       description: true,
+      //       userId: true,
+      //       url: true,
+      //       createIn: true,
+      //     },
+      //   },
+      //   // { $sample: { size: pageLimit } },
+      //   { $skip: startIndex },
+      //   { $limit: pageLimit },
+      // ]);
 
-      const results = resultsDb.sort(() => Math.random() - 0.5);
+      // const results = resultsDb.sort(() => Math.random() - 0.5);
 
       this.midia = {
         results,
@@ -744,6 +771,7 @@ module.exports = class Midia {
         midiaId => !midiaDeleteIds.includes(midiaId.toString())
       );
       await this.user.save();
+      await SavesModel.deleteMany({ midia: { $in: midiaDeleteIds } });
 
       try {
         await deleteObjectS3(midiaDeletePaths);

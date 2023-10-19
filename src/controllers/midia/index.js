@@ -136,11 +136,12 @@ class MidiaController {
 
   async index(req, res) {
     const page = parseInt(req.query.page) || 1;
-    const preferences = req.query.preferences || '';
+    const midiaType = req.query.midiaType;
+    const order = req.query.order;
 
     const midia = new Midia();
 
-    const midiaInfo = await midia.getAllMidiaUsers(page);
+    const midiaInfo = await midia.getAllMidiaUsers(page, midiaType, order);
 
     if (midia.errors.length) {
       res
