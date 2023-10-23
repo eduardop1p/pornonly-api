@@ -22,6 +22,8 @@ const MidiaSchema = new Schema({
   packId: [{ type: Types.ObjectId, ref: 'Packs' }],
   path: { type: String, require: true },
   url: { type: String, require: true },
+  thumb: { type: String, require: false },
+  duration: { type: String, require: false },
   createIn: { type: Date, default: Date.now },
 });
 
@@ -63,6 +65,8 @@ module.exports = class Midia {
           'description',
           'userId',
           'url',
+          'thumb',
+          'duration',
           'midiaType',
           'likes',
           ,
@@ -126,6 +130,8 @@ module.exports = class Midia {
       //       description: true,
       //       userId: true,
       //       url: true,
+      //       thumb: true,
+      //       duration: true,
       //       createIn: true,
       //     },
       //   },
@@ -170,6 +176,8 @@ module.exports = class Midia {
           'height',
           'tags',
           'url',
+          'thumb',
+          'duration',
           'createIn',
         ])
         .skip(startIndex)
@@ -213,6 +221,8 @@ module.exports = class Midia {
           'userId',
           'packId',
           'url',
+          'thumb',
+          'duration',
           'createIn',
         ])
         .populate({
@@ -264,6 +274,8 @@ module.exports = class Midia {
           'userId',
           'packId',
           'url',
+          'thumb',
+          'duration',
           'createIn',
         ])
         .populate({
@@ -304,7 +316,7 @@ module.exports = class Midia {
 
     try {
       // const results = await MidiaModel.find({ midiaType })
-      //   .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'createIn'])
+      //   .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'thumb', 'duration', 'createIn'])
       //   .populate({
       //     path: 'userId',
       //     select: ['_id', 'username', 'profilePhoto'],
@@ -354,6 +366,8 @@ module.exports = class Midia {
             tags: true,
             userId: true,
             url: true,
+            thumb: true,
+            duration: true,
             createIn: true,
           },
         },
@@ -407,6 +421,8 @@ module.exports = class Midia {
           'tags',
           'userId',
           'url',
+          'thumb',
+          'duration',
           'createIn',
         ])
         .populate({
@@ -521,6 +537,8 @@ module.exports = class Midia {
           'tags',
           'userId',
           'url',
+          'thumb',
+          'duration',
           'createIn',
         ])
         .populate({
@@ -583,6 +601,8 @@ module.exports = class Midia {
       //     'tags',
       //     'userId',
       //     'url',
+      //     'thumb',
+      //     'duration',
       //     'createIn',
       //   ])
       //   .populate({
@@ -643,6 +663,8 @@ module.exports = class Midia {
             description: true,
             userId: true,
             url: true,
+            thumb: true,
+            duration: true,
             createIn: true,
           },
         },
@@ -686,6 +708,8 @@ module.exports = class Midia {
           'tags',
           'userId',
           'url',
+          'thumb',
+          'duration',
           'createIn',
         ])
         .populate({
@@ -750,8 +774,8 @@ module.exports = class Midia {
 
   async deleteMidia(midiaDelete, userId) {
     try {
-      const midiaDeleteIds = midiaDelete.map(midiaId => midiaId.id);
-      const midiaDeletePaths = midiaDelete.map(midiaId => ({ Key: midiaId.key }));
+      const midiaDeleteIds = midiaDelete.map(value => value.id);
+      const midiaDeletePaths = midiaDelete.map(value => ({ Key: value.key }));
 
       this.user = await UsersModel.findById(userId);
 

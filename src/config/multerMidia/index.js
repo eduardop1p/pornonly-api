@@ -9,6 +9,7 @@ const { imgsMimetypes, gifsMimetypes } = require('../../services/midiaMimetypes'
 const random = () => Math.floor(Math.random() * 10000 + 10000);
 
 const destinationPath = file => {
+  if (file.fieldname === 'thumb') return `thumb-videos/${Date.now()}_${random()}.jpg`;
   if (imgsMimetypes.indexOf(file.mimetype) !== -1)
     return `imgs/${Date.now()}_${random()}${extname(file.originalname)}`;
   if (gifsMimetypes.indexOf(file.mimetype) !== -1)

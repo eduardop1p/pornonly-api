@@ -10,7 +10,10 @@ const deleteObjectS3 = require('../../services/deleteObjectS3');
 const getVideoDimensions = require('../../config/getVideoDimensions');
 const getImageDimensions = require('../../config/getImageDimensions');
 
-const upload = multer(multerConfig).single('midia');
+const upload = multer(multerConfig).fields([
+  { name: 'midia', maxCount: 1 },
+  { name: 'thumb', maxCount: 1 },
+]);
 
 class MidiaController {
   async store(req, res) {
@@ -26,14 +29,17 @@ class MidiaController {
         return;
       }
 
-      if (!req.file) {
+      if (!req.files) {
         res.status(400).json({ type: 'server', error: 'Erro desconhecido, tente novalmente.' });
         return;
       }
+      const midiaFile = req.files.midia[0];
+      const thumbFile = get(req.files, 'thumb', false);
+
       // const contentLength = Buffer.byteLength(req.file);
       // res.apppend('Content-Length', contentLength);
 
-      const { mimetype, key } = req.file;
+      const { mimetype, key } = midiaFile;
 
       const { userId } = req;
 
@@ -70,26 +76,35 @@ class MidiaController {
 
       // const videoMetada = await getVideoDimensions(req.file.location);
       // const imageMetada = await getImageDimensions(req.file.location);
+
       const midiaType = midiaTypes();
-      const tags = req.body.tags.trimEnd().split(' ');
       const path = key;
-      const midiaMetada =
-        midiaType === 'video'
-          ? await getVideoDimensions(`${process.env.CURRENT_DOMAIN}/${path}`)
-          : await getImageDimensions(`${process.env.CURRENT_DOMAIN}/${path}`);
+      const tags = req.body.tags.trimEnd().split(' ');
       const url = `${process.env.CURRENT_DOMAIN}/${path}`;
-      const { width, height } = midiaMetada;
+      const thumb = thumbFile ? `${process.env.CURRENT_DOMAIN}/${thumbFile[0].key}` : '';
+      const imgDimensions = await getImageDimensions(`${process.env.CURRENT_DOMAIN}/${path}`);
+      const imgHeight = imgDimensions.height;
+      const imgWidth = imgDimensions.width;
+      const videoDimensions = await getVideoDimensions(`${process.env.CURRENT_DOMAIN}/${path}`);
+      const videoHeight = videoDimensions.height;
+      const videoWidth = videoDimensions.width;
+      const videoDuration = videoDimensions.duration;
+      const dimensionsMidia = {
+        width: midiaType === 'video' ? videoWidth : imgWidth,
+        height: midiaType === 'video' ? videoHeight : imgHeight,
+        duration: midiaType === 'video' ? videoDuration : '',
+      };
 
       const body = {
         title,
         description,
         midiaType,
-        width,
-        height,
         tags,
         userId,
         path,
         url,
+        thumb,
+        ...dimensionsMidia,
       };
 
       const midia = new Midia(body);
@@ -98,7 +113,8 @@ class MidiaController {
 
       if (midia.errors.length) {
         try {
-          await deleteObjectS3(path);
+          if (thumbFile) await deleteObjectS3([{ Key: thumbFile[0].key }]);
+          await deleteObjectS3([{ Key: path }]);
         } catch {
           res.status(500).json({
             type: 'server',

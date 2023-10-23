@@ -37,6 +37,8 @@ module.exports = class Saves {
             'tags',
             'url',
             'userId',
+            'thumb',
+            'duration',
             'createIn',
           ],
           populate: {
