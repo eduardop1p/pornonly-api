@@ -41,6 +41,14 @@ module.exports = class Midia {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
+  orderBy(order) {
+    if (order === 'popular') return { likes: -1 };
+    if (order === 'desc') return { createIn: -1 };
+    if (order === 'asc') return { createIn: 1 };
+
+    return undefined;
+  }
+
   async getAllMidiaUsers(page, midiaType, order) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
@@ -48,13 +56,6 @@ module.exports = class Midia {
 
     try {
       const total = await MidiaModel.countDocuments();
-      const orderBy = () => {
-        if (order === 'popular') return { likes: -1 };
-        if (order === 'desc') return { createIn: -1 };
-        if (order === 'asc') return { createIn: 1 };
-
-        return undefined;
-      };
 
       const results = await MidiaModel.find({
         midiaType: midiaType ? midiaType : { $exists: true },
@@ -69,12 +70,11 @@ module.exports = class Midia {
           'duration',
           'midiaType',
           'likes',
-          ,
           'height',
           'width',
           'createIn',
         ])
-        .sort(orderBy())
+        .sort(this.orderBy(order))
         .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
         .limit(pageLimit)
         .populate({
@@ -309,73 +309,87 @@ module.exports = class Midia {
     }
   }
 
-  async getAllMidiaType(midiaType, page) {
+  async getAllMidiaType(midiaType, page, order) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
 
     try {
-      // const results = await MidiaModel.find({ midiaType })
-      //   .select(['_id', 'title', 'description', 'midiaType', 'tags', 'userId', 'url', 'thumb', 'duration', 'createIn'])
-      //   .populate({
-      //     path: 'userId',
-      //     select: ['_id', 'username', 'profilePhoto'],
-      //     populate: {
-      //       path: 'profilePhoto',
-      //       select: ['_id', 'url'],
+      const results = await MidiaModel.find({ midiaType })
+        .select([
+          '_id',
+          'title',
+          'description',
+          'userId',
+          'url',
+          'thumb',
+          'duration',
+          'midiaType',
+          'tags',
+          'likes',
+          'height',
+          'width',
+          'createIn',
+        ])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'username', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
+          },
+        })
+        .skip(startIndex)
+        .limit(pageLimit)
+        .sort(this.orderBy(order));
+
+      // const resultsDb = await MidiaModel.aggregate([
+      //   { $match: { midiaType } },
+      //   // { $sample: { size: pageLimit } },
+      //   {
+      //     $lookup: {
+      //       from: UsersModel.collection.name,
+      //       localField: 'userId',
+      //       foreignField: '_id',
+      //       as: 'userId',
+      //       pipeline: [{ $project: { _id: true, name: true, profilePhoto: true } }],
       //     },
-      //   })
-      //   .skip(startIndex)
-      //   .limit(pageLimit)
-      //   .sort({ createIn: -1 });
+      //   },
+      //   { $unwind: { path: '$userId' } },
+      //   {
+      //     $lookup: {
+      //       from: ProfilePhotosModel.collection.name,
+      //       localField: 'userId.profilePhoto',
+      //       foreignField: '_id',
+      //       as: 'userId.profilePhoto',
+      //       pipeline: [
+      //         {
+      //           $project: { _id: true, url: true },
+      //         },
+      //       ],
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: true,
+      //       title: true,
+      //       description: true,
+      //       midiaType: true,
+      //       width: true,
+      //       height: true,
+      //       tags: true,
+      //       userId: true,
+      //       url: true,
+      //       thumb: true,
+      //       duration: true,
+      //       createIn: true,
+      //     },
+      //   },
+      //   { $skip: startIndex },
+      //   { $limit: pageLimit },
+      // ]);
 
-      const resultsDb = await MidiaModel.aggregate([
-        { $match: { midiaType } },
-        // { $sample: { size: pageLimit } },
-        {
-          $lookup: {
-            from: UsersModel.collection.name,
-            localField: 'userId',
-            foreignField: '_id',
-            as: 'userId',
-            pipeline: [{ $project: { _id: true, name: true, profilePhoto: true } }],
-          },
-        },
-        { $unwind: { path: '$userId' } },
-        {
-          $lookup: {
-            from: ProfilePhotosModel.collection.name,
-            localField: 'userId.profilePhoto',
-            foreignField: '_id',
-            as: 'userId.profilePhoto',
-            pipeline: [
-              {
-                $project: { _id: true, url: true },
-              },
-            ],
-          },
-        },
-        {
-          $project: {
-            _id: true,
-            title: true,
-            description: true,
-            midiaType: true,
-            width: true,
-            height: true,
-            tags: true,
-            userId: true,
-            url: true,
-            thumb: true,
-            duration: true,
-            createIn: true,
-          },
-        },
-        { $skip: startIndex },
-        { $limit: pageLimit },
-      ]);
-
-      const results = resultsDb.sort(() => Math.random() - 0.5);
+      // const results = resultsDb.sort(() => Math.random() - 0.5);
       const total = results.length;
 
       this.midia = {

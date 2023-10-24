@@ -268,10 +268,11 @@ class MidiaController {
   async indexAllMidiaType(req, res) {
     const { midiaType } = req.params;
     const page = parseInt(req.query.page) || 1;
+    const order = req.query.order;
 
     const midia = new Midia();
 
-    const midiaInfo = await midia.getAllMidiaType(midiaType, page);
+    const midiaInfo = await midia.getAllMidiaType(midiaType, page, order);
 
     if (midia.errors.length) {
       res
