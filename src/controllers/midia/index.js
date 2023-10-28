@@ -421,6 +421,24 @@ class MidiaController {
 
     res.json({ titlesMidia: midiaTitles });
   }
+
+  async showMidiaTags(req, res) {
+    const { tag } = req.query;
+    if (!tag) return res.json({ midiaTags: [] });
+
+    const midia = new Midia();
+
+    const midiaTags = await midia.showAllMidiaTags(tag);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midiaTags });
+  }
 }
 
 module.exports = new MidiaController();

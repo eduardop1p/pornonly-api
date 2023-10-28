@@ -1,4 +1,5 @@
 const { Schema, model, Types } = require('mongoose');
+const mongoose = require('mongoose');
 const { rm } = require('fs/promises');
 const { resolve } = require('path');
 
@@ -28,6 +29,12 @@ const MidiaSchema = new Schema({
 });
 
 const MidiaModel = model('Midia', MidiaSchema);
+
+const TagsSchema = new Schema({
+  tag: { type: String, require: true },
+});
+
+const TagsModel = model('Tags', TagsSchema);
 
 module.exports = class Midia {
   constructor(body) {
@@ -909,6 +916,25 @@ module.exports = class Midia {
         ],
       })
         .select(['title'])
+        .limit(10);
+
+      return results;
+    } catch (err) {
+      console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async showAllMidiaTags(tag) {
+    try {
+      const results = await TagsModel.find({
+        tag: { $regex: new RegExp(`${tag}?`, 'i') },
+      })
+        .select(['tag'])
         .limit(10);
 
       return results;
