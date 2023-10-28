@@ -406,7 +406,7 @@ class MidiaController {
 
   async showMidiaTitles(req, res) {
     const { search_query } = req.query;
-    if (!search_query) return res.json({ titlesMidia: [] });
+    if (!search_query) return res.json({ midiaTitles: [] });
 
     const midia = new Midia();
 
@@ -419,7 +419,7 @@ class MidiaController {
       return;
     }
 
-    res.json({ titlesMidia: midiaTitles });
+    res.json({ midiaTitles: midiaTitles });
   }
 
   async showMidiaTags(req, res) {

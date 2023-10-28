@@ -932,7 +932,7 @@ module.exports = class Midia {
   async showAllMidiaTags(tag) {
     try {
       const results = await TagsModel.find({
-        tag: { $regex: new RegExp(`${tag}?`, 'i') },
+        tag: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') },
       })
         .select(['tag'])
         .limit(10);
