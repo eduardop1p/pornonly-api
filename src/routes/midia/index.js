@@ -16,6 +16,7 @@ router.get('/get-all-midia-day', midiaController.indexAllMidiaDay);
 router.get('/get-all-midia-userid/:userId', midiaController.indexAllMidiaUserId);
 router.get('/get-all-midia-titles', midiaController.showMidiaTitles);
 router.get('/get-all-midia-tags', midiaController.showMidiaTags);
+router.get('/get-all-midia-tags-category', midiaController.indexMidiaTagsCategory);
 
 router.get('/get-all-midia-packsnoid', loginRequired, midiaController.indexAllMidiaPackNoId);
 router.get('/like-in-comment/:midiaId', loginRequired, midiaController.storeLikeInComment);

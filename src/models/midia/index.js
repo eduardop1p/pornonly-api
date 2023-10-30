@@ -949,6 +949,21 @@ module.exports = class Midia {
       });
     }
   }
+
+  async indexAllMidiaTags() {
+    try {
+      const results = await TagsModel.find().select(['tag']);
+
+      return results;
+    } catch (err) {
+      console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
 };
 
 module.exports.MidiaModel = MidiaModel;
