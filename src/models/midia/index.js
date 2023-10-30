@@ -594,7 +594,7 @@ module.exports = class Midia {
     }
   }
 
-  async getAllMidiaSearchTags(searchTags, page) {
+  async getAllMidiaSearchTags(searchTags, page, order) {
     if (!searchTags.join()) return;
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
@@ -609,92 +609,94 @@ module.exports = class Midia {
 
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
-      // const results = await MidiaModel.find({
-      //   $or: arrayRegex,
-      // })
-      //   .select([
-      //     '_id',
-      //     'title',
-      //     'description',
-      //     'midiaType',
-      //     'width',
-      //     'height',
-      //     'tags',
-      //     'userId',
-      //     'url',
-      //     'thumb',
-      //     'duration',
-      //     'createIn',
-      //   ])
-      //   .populate({
-      //     path: 'userId',
-      //     select: ['_id', 'username', 'profilePhoto'],
-      //     populate: {
-      //       path: 'profilePhoto',
-      //       select: ['_id', 'url'],
-      //     },
-      //   })
-      //   .skip(startIndex)
-      //   .limit(pageLimit)
-      //   .sort({ createIn: -1 });
-      const resultsDb = await MidiaModel.aggregate([
-        {
-          $match: {
-            $or: arrayRegex,
+      const results = await MidiaModel.find({
+        $or: arrayRegex,
+      })
+        .select([
+          '_id',
+          'title',
+          'midiaType',
+          'width',
+          'height',
+          'tags',
+          'description',
+          'userId',
+          'url',
+          'thumb',
+          'duration',
+          'createIn',
+        ])
+        .populate({
+          path: 'userId',
+          select: ['_id', 'username', 'profilePhoto'],
+          populate: {
+            path: 'profilePhoto',
+            select: ['_id', 'url'],
           },
-        },
-        {
-          $lookup: {
-            from: UsersModel.collection.name,
-            localField: 'userId',
-            foreignField: '_id',
-            as: 'userId',
-            pipeline: [
-              {
-                $project: { _id: true, username: true, profilePhoto: true },
-              },
-            ],
-          },
-        },
-        { $unwind: { path: '$userId' } },
-        {
-          $lookup: {
-            from: ProfilePhotosModel.collection.name,
-            localField: 'userId.profilePhoto',
-            foreignField: '_id',
-            as: 'userId.profilePhoto',
-            pipeline: [
-              {
-                $project: {
-                  _id: true,
-                  url: true,
-                },
-              },
-            ],
-          },
-        },
-        {
-          $project: {
-            _id: true,
-            title: true,
-            midiaType: true,
-            tags: true,
-            width: true,
-            height: true,
-            description: true,
-            userId: true,
-            url: true,
-            thumb: true,
-            duration: true,
-            createIn: true,
-          },
-        },
-        // { $sample: { size: pageLimit } },
-        { $skip: startIndex },
-        { $limit: pageLimit },
-      ]);
+        })
+        .skip(startIndex)
+        .limit(pageLimit)
+        .sort(this.orderBy(order));
 
-      const results = resultsDb.sort(() => Math.random() - 0.5);
+      // const resultsDb = await MidiaModel.aggregate([
+      //   {
+      //     $match: {
+      //       $or: arrayRegex,
+      //     },
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: UsersModel.collection.name,
+      //       localField: 'userId',
+      //       foreignField: '_id',
+      //       as: 'userId',
+      //       pipeline: [
+      //         {
+      //           $project: { _id: true, username: true, profilePhoto: true },
+      //         },
+      //       ],
+      //     },
+      //   },
+      //   { $unwind: { path: '$userId' } },
+      //   {
+      //     $lookup: {
+      //       from: ProfilePhotosModel.collection.name,
+      //       localField: 'userId.profilePhoto',
+      //       foreignField: '_id',
+      //       as: 'userId.profilePhoto',
+      //       pipeline: [
+      //         {
+      //           $project: {
+      //             _id: true,
+      //             url: true,
+      //           },
+      //         },
+      //       ],
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: true,
+      //       title: true,
+      //       midiaType: true,
+      //       tags: true,
+      //       width: true,
+      //       height: true,
+      //       description: true,
+      //       userId: true,
+      //       url: true,
+      //       thumb: true,
+      //       duration: true,
+      //       createIn: true,
+      //     },
+      //   },
+      //   // { $sample: { size: pageLimit } },
+      //   { $sort: this.orderBy(order) },
+      //   { $skip: startIndex },
+      //   { $limit: pageLimit },
+      // ]);
+
+      // const results = resultsDb.sort(() => Math.random() - 0.5);
       const total = results.length;
 
       this.midia = {

@@ -79,7 +79,7 @@ class MidiaController {
 
       const midiaType = midiaTypes();
       const path = key;
-      const tags = req.body.tags.trimEnd().split(' ');
+      const tags = req.body.tags.trim().split(',');
       const url = `${process.env.CURRENT_DOMAIN}/${path}`;
       const thumb = thumbFile ? `${process.env.CURRENT_DOMAIN}/${thumbFile[0].key}` : '';
       const imgDimensions = await getImageDimensions(`${process.env.CURRENT_DOMAIN}/${path}`);
@@ -327,8 +327,9 @@ class MidiaController {
   }
 
   async indexSearchTags(req, res) {
-    const searchTags = req.query.search_tags.toLowerCase().split(',') || [];
+    const searchTags = req.query.search_tags.trim().split(',') || [];
     const page = parseInt(req.query.page) || 1;
+    const order = req.query.order;
 
     if (searchTags.length > 5) {
       res.status(400).json({ type: 'tags', error: 'Tente uma pesquisa com menos de 5 tags.' });
@@ -337,7 +338,7 @@ class MidiaController {
 
     const midia = new Midia();
 
-    const midiaInfo = await midia.getAllMidiaSearchTags(searchTags, page);
+    const midiaInfo = await midia.getAllMidiaSearchTags(searchTags, page, order);
 
     if (midia.errors.length) {
       res
