@@ -29,7 +29,7 @@ class MidiaController {
         return;
       }
 
-      if (!req.files || req.files.midia) {
+      if (!req.files || !req.files.midia) {
         res.status(400).json({ type: 'server', error: 'Erro desconhecido, tente novalmente.' });
         return;
       }
