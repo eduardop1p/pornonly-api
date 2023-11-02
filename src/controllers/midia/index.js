@@ -2,6 +2,7 @@ const multer = require('multer');
 const { resolve } = require('path');
 const { get } = require('lodash');
 const { decode } = require('jsonwebtoken');
+const unorm = require('unorm');
 
 const Midia = require('../../models/midia');
 const multerConfig = require('../../config/multerMidia');
@@ -77,9 +78,18 @@ class MidiaController {
       // const videoMetada = await getVideoDimensions(req.file.location);
       // const imageMetada = await getImageDimensions(req.file.location);
 
+      const removeAccents = value => {
+        if (!/[áàãâäéèêëíìîïóòõôöúùûüç]/.test(value)) return;
+        return unorm.nfkd(value).replace(/[\u0300-\u036f]/g, '');
+      };
+
       const midiaType = midiaTypes();
       const path = key;
-      const tags = req.body.tags.trim().split(',');
+      const tagsQuery = req.body.tags.trim().split(',');
+      const tags = [
+        ...tagsQuery,
+        ...tagsQuery.map(tag => removeAccents(tag)).filter(val => val != null || val != undefined),
+      ];
       const url = `${process.env.CURRENT_DOMAIN}/${path}`;
       const thumb = thumbFile ? `${process.env.CURRENT_DOMAIN}/${thumbFile[0].key}` : '';
       const imgDimensions = await getImageDimensions(`${process.env.CURRENT_DOMAIN}/${path}`);

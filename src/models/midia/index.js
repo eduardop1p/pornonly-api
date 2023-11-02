@@ -2,6 +2,7 @@ const { Schema, model, Types } = require('mongoose');
 const mongoose = require('mongoose');
 const { rm } = require('fs/promises');
 const { resolve } = require('path');
+const unorm = require('unorm');
 
 const { UsersModel } = require('../users');
 const { ProfilePhotosModel } = require('../profilePhoto');
@@ -46,6 +47,10 @@ module.exports = class Midia {
 
   escapedStrint(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  removeAccents(value) {
+    return unorm.nfkd(value).replace(/[\u0300-\u036f]/g, '');
   }
 
   orderBy(order) {
@@ -595,17 +600,13 @@ module.exports = class Midia {
   }
 
   async getAllMidiaSearchTags(searchTags, page, order) {
-    if (!searchTags.join()) return;
+    if (!searchTags.join() || !searchTags.length) searchTags = ['ruivas', 'novinhas', 'loiras'];
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
     const arrayRegex = searchTags.map(tag => ({
       tags: { $regex: new RegExp(`${this.escapedStrint(tag)}?`, 'i') },
     }));
-    // const arrayRegex2 = searchTags.map(tag => ({
-    //   tags: { $in: new RegExp(tag.slice(0, -1), 'i') },
-    // }));
-    // const arrRegexquery = [...arrayRegex, ...arrayRegex2];
 
     try {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
@@ -934,7 +935,10 @@ module.exports = class Midia {
   async showAllMidiaTags(tag) {
     try {
       const results = await TagsModel.find({
-        tag: { $regex: new RegExp(`${this.escapedStrint(tag)}?`, 'i') },
+        $or: [
+          { tag: { $regex: new RegExp(`${this.escapedStrint(tag)}?`, 'i') } },
+          { tagNormalized: { $regex: new RegExp(`${this.escapedStrint(tag)}?`, 'i') } },
+        ],
       })
         .select(['tag'])
         .limit(10);
