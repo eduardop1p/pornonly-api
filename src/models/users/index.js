@@ -298,6 +298,29 @@ module.exports = class Users {
     }
   }
 
+  async userExistPassword(email) {
+    try {
+      this.user = await UsersModel.findOne({ email });
+
+      if (!this.user) {
+        this.errors.push({
+          type: 'server',
+          code: 400,
+          msg: 'Nenhum usuário encontrado com este email',
+        });
+        return;
+      }
+
+      return;
+    } catch {
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
   async userExistUsername() {
     const { username } = this.body;
 
