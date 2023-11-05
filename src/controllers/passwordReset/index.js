@@ -20,6 +20,8 @@ class PasswordResetController {
       return;
     }
 
+    // falta adcionar o envio de email aqui
+
     res.json({ type: 'server', success: `Um email foi enviado para: ${email}` });
   }
 }

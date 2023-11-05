@@ -37,7 +37,7 @@ class UsersController {
       });
     }
     if (!isEmail(email)) {
-      return res.status(400).json({ type: 'email', error: `'${email}' não é um email válido.` });
+      return res.status(400).json({ type: 'email', error: `Email inválido.` });
     }
     if (password !== repeatPassword) {
       return res.status(400).json({ type: 'password', error: 'As senhas não se coincidem.' });
@@ -133,31 +133,31 @@ class UsersController {
 
     const { username, email, password, repeatPassword } = body;
 
-    if (username.length < 4 || username.length > 15) {
+    if (username && (username.length < 4 || username.length > 15)) {
       return res.status(400).json({
         type: 'username',
         error: 'Usuário deve ter ao menos 4 caracteres e no máximo 15.',
       });
     }
-    if (!isAlphanumeric(username) || !isLowercase(username)) {
+    if (username && !username.match(/^[a-z0-9-_]*$/)) {
       return res.status(400).json({
         type: 'username',
-        error: 'Usuário deve conter apenas letras minúsculas e números.',
+        error: 'Usuário deve conter: letras minusculas, números e espaços apenas com ( - ou _ ).',
       });
     }
-    if (!isEmail(email)) {
-      return res.status(400).json({ type: 'email', error: `'${email}' não é um email válido.` });
+    if (email && !isEmail(email)) {
+      return res.status(400).json({ type: 'email', error: `Email inválido` });
     }
-    if (password !== repeatPassword) {
+    if (password && password !== repeatPassword) {
       return res.status(400).json({ type: 'password', error: 'As senhas não se coincidem.' });
     }
-    if (password.length < 5 || password.length > 20) {
+    if (password && (password.length < 5 || password.length > 20)) {
       return res
         .status(400)
         .json({ type: 'password', error: 'Senha deve ter ao menos 5 caracteres e no máximo 20.' });
     }
     const rgPassword = /[!@#$%^&*(),.?":{}|<>]/;
-    if (!rgPassword.test(password)) {
+    if (password && !rgPassword.test(password)) {
       return res.status(400).json({
         type: 'password',
         error: 'Senha deve ter ao menos 1 caractere especial ex: @#$!*&%^.',
