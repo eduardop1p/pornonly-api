@@ -465,6 +465,23 @@ class MidiaController {
 
     res.json({ midiaTags });
   }
+
+  async indexAllMidiaUserIdLength(req, res) {
+    const { userId } = req.params;
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaUserIdLength(userId);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midia: midiaInfo });
+  }
 }
 
 module.exports = new MidiaController();

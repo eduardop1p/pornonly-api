@@ -63,11 +63,30 @@ module.exports = class Saves {
       //   return;
       // }
 
-      const total = results.length;
+      const total = (await SavesModel.find({ userId }).select(['_id'])).length;
       this.save = {
         results: results.map(obj => obj.midia),
         currentPage: page,
         totalPages: Math.ceil(total / pageLimit),
+        totalResults: total,
+      };
+
+      return this.save;
+    } catch {
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async indexSaveLength(userId) {
+    try {
+      const results = await SavesModel.find({ userId }).select(['_id']);
+
+      const total = results.length;
+      this.save = {
         totalResults: total,
       };
 

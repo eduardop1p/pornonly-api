@@ -196,7 +196,7 @@ module.exports = class Midia {
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      const total = results.length;
+      const total = (await MidiaModel.find({ userId }).select(['_id'])).length;
 
       this.midia = {
         results,
@@ -961,6 +961,26 @@ module.exports = class Midia {
       return results;
     } catch (err) {
       console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async getAllMidiaUserIdLength(userId) {
+    try {
+      const results = await MidiaModel.find({ userId }).select(['_id']);
+
+      const total = results.length;
+
+      this.midia = {
+        totalResults: total,
+      };
+
+      return this.midia;
+    } catch {
       this.errors.push({
         type: 'server',
         code: 500,

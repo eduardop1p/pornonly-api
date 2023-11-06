@@ -26,6 +26,30 @@ class SavesController {
     res.json({ midia: allSaveUser });
   }
 
+  async indexAllSavesLength(req, res) {
+    const { userId } = req.params;
+
+    if (!userId || typeof userId !== 'string') {
+      res
+        .status(401)
+        .json({ type: 'server', error: 'Faça login para ter permissão a essa funcionalidade.' });
+      return;
+    }
+
+    const save = new Saves();
+
+    const allSaveUser = await save.indexSaveLength(userId);
+
+    if (save.errors.length) {
+      res
+        .status(save.errors[0].code)
+        .json({ type: save.errors[0].type, error: save.errors[0].msg });
+      return;
+    }
+
+    res.json({ midia: allSaveUser });
+  }
+
   async store(req, res) {
     const { userId } = req;
 
