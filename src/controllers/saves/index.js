@@ -4,6 +4,7 @@ class SavesController {
   async index(req, res) {
     const { userId } = req.params;
     const page = parseInt(req.query.page) || 1;
+    const midiaType = req.query.midiaType;
 
     if (!userId || typeof userId !== 'string') {
       res
@@ -14,7 +15,7 @@ class SavesController {
 
     const save = new Saves();
 
-    const allSaveUser = await save.indexSave(userId, page);
+    const allSaveUser = await save.indexSave(userId, midiaType, page);
 
     if (save.errors.length) {
       res

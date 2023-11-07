@@ -17,13 +17,15 @@ module.exports = class Saves {
     this.errors = [];
   }
 
-  async indexSave(userId, page) {
+  async indexSave(userId, midiaType, page) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
 
     try {
-      const results = await SavesModel.find({ userId })
+      const results = await SavesModel.find({
+        userId,
+      })
         .select(['midia'])
         .populate({
           path: 'midia',
@@ -41,6 +43,7 @@ module.exports = class Saves {
             'duration',
             'createIn',
           ],
+          match: { midiaType: midiaType ? midiaType : { $exists: true } },
           populate: {
             path: 'userId',
             select: ['_id', 'username', 'profilePhoto'],
@@ -54,18 +57,9 @@ module.exports = class Saves {
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      // if (!results.length) {
-      //   this.errors.push({
-      //     type: 'server',
-      //     code: 400,
-      //     msg: 'Nenhuma publicação salva.',
-      //   });
-      //   return;
-      // }
-
       const total = (await SavesModel.find({ userId }).select(['_id'])).length;
       this.save = {
-        results: results.map(obj => obj.midia),
+        results: results.filter(obj => obj.midia !== null).map(obj => obj.midia),
         currentPage: page,
         totalPages: Math.ceil(total / pageLimit),
         totalResults: total,
