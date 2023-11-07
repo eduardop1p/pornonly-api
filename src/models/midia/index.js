@@ -172,13 +172,16 @@ module.exports = class Midia {
     }
   }
 
-  async getAllMidiaUserId(userId, page) {
+  async getAllMidiaUserId(userId, midiaType, page) {
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
     const endIndex = page * pageLimit;
 
     try {
-      const results = await MidiaModel.find({ userId })
+      const results = await MidiaModel.find({
+        userId,
+        midiaType: midiaType ? midiaType : { $exists: true },
+      })
         .select([
           '_id',
           'title',
