@@ -18,6 +18,7 @@ const packsRouter = require('./routes/packs');
 const savesRouter = require('./routes/saves');
 const responsesCommentsRouter = require('./routes/responsesComments');
 const passwordResetRouter = require('./routes/passwordReset');
+const categoryRouter = require('./routes/category');
 
 class App {
   constructor() {
@@ -59,6 +60,7 @@ class App {
     this.app.use('/packs', packsRouter);
     this.app.use('/saves', savesRouter);
     this.app.use('/password-reset', passwordResetRouter);
+    this.app.use('/category', categoryRouter);
     this.app.use((req, res) => res.status(404).json({ status: 404 }));
   }
 

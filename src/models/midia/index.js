@@ -991,6 +991,44 @@ module.exports = class Midia {
       });
     }
   }
+
+  async getAllCategory() {
+    try {
+      const allTags = (await TagsModel.find().select(['tag', ''])).map(val => val.tag);
+      const arrayRegex = allTags.map(tag => ({
+        tags: { $regex: new RegExp(`${this.escapedStrint(tag)}?`, 'i') },
+        tagName: tag,
+      }));
+
+      const results = [];
+      for (const regex of arrayRegex) {
+        const newRegex = Object.entries(regex).map(([key, value]) => ({ [key]: value }));
+        const result = await MidiaModel.findOne({ midiaType: 'img', ...newRegex[0] })
+          .select(['_id', 'title', 'width', 'height', 'url'])
+          .sort(this.orderBy('popular'));
+
+        results.push({
+          _id: result._id,
+          title: result.title,
+          tag: regex.tagName,
+          width: result.width,
+          height: result.height,
+          url: result.url,
+        });
+      }
+
+      // console.log(results.map((val, index) => ({ val, tags: uniqueTagsArray[index] })));
+
+      this.midia = { results };
+      return this.midia;
+    } catch {
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
 };
 
 module.exports.MidiaModel = MidiaModel;
