@@ -602,7 +602,7 @@ module.exports = class Midia {
     }
   }
 
-  async getAllMidiaSearchTags(searchTags, page, order) {
+  async getAllMidiaSearchTags(searchTags, page, order, midiaType) {
     if (!searchTags.join() || !searchTags.length) searchTags = ['ruivas', 'novinhas', 'loiras'];
     const pageLimit = 30;
     const startIndex = (page - 1) * pageLimit;
@@ -615,6 +615,7 @@ module.exports = class Midia {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
       const results = await MidiaModel.find({
         $or: arrayRegex,
+        midiaType: midiaType ? midiaType : { $exists: true },
       })
         .select([
           '_id',

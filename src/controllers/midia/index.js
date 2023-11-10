@@ -340,6 +340,7 @@ class MidiaController {
   async indexSearchTags(req, res) {
     const searchTags = req.query.search_tags.trim().split(',') || [];
     const page = parseInt(req.query.page) || 1;
+    const midiaType = req.query.midiaType;
     const order = req.query.order;
 
     if (searchTags.length > 5) {
@@ -349,7 +350,7 @@ class MidiaController {
 
     const midia = new Midia();
 
-    const midiaInfo = await midia.getAllMidiaSearchTags(searchTags, page, order);
+    const midiaInfo = await midia.getAllMidiaSearchTags(searchTags, page, order, midiaType);
 
     if (midia.errors.length) {
       res
