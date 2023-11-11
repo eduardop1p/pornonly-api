@@ -15,7 +15,7 @@ module.exports = async function (req, res, next) {
   try {
     const data = jwt.verify(token, process.env.TOKEN_SECRET);
 
-    const { _id, email } = data;
+    const { _id, email, isAdmin } = data;
 
     // const user = await UsersModel.findById(_id).select(['_id']);
 
@@ -26,6 +26,7 @@ module.exports = async function (req, res, next) {
 
     req.userId = _id;
     req.email = email;
+    req.isAdmin = isAdmin;
 
     next();
     return;

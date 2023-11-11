@@ -11,6 +11,7 @@ const usersSchema = new Schema({
   profilePhoto: [{ type: Types.ObjectId, ref: 'ProfilePhotos' }],
   midia: [{ type: Types.ObjectId, require: false, ref: 'Midia' }],
   saves: [{ type: Types.ObjectId, require: false, ref: 'Saves' }],
+  isAdmin: { type: Boolean, require: true, default: false },
   password: { type: String, required: true },
   createIn: { type: Date, default: Date.now },
 });

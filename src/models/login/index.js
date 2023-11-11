@@ -16,7 +16,12 @@ module.exports = class Login {
     try {
       const { email, password } = this.body;
 
-      this.user = await UsersModel.findOne({ password }).select(['_id', 'username', 'email']);
+      this.user = await UsersModel.findOne({ password }).select([
+        '_id',
+        'username',
+        'email',
+        'isAdmin',
+      ]);
       if (!this.user) {
         this.errors.push({
           type: 'password',

@@ -26,6 +26,7 @@ const MidiaSchema = new Schema({
   url: { type: String, require: true },
   thumb: { type: String, require: false },
   duration: { type: String, require: false },
+  status: { type: String, require: true, default: 'pending' },
   createIn: { type: Date, default: Date.now },
 });
 
@@ -71,6 +72,7 @@ module.exports = class Midia {
 
       const results = await MidiaModel.find({
         midiaType: midiaType ? midiaType : { $exists: true },
+        status: 'published',
       }) // tras os resultados em ordem crescente com sort 1
         .select([
           '_id',
@@ -193,13 +195,14 @@ module.exports = class Midia {
           'url',
           'thumb',
           'duration',
+          'status',
           'createIn',
         ])
         .skip(startIndex)
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      const total = (await MidiaModel.find({ userId }).select(['_id'])).length;
+      const total = (await MidiaModel.find({ userId, status: 'published' }).select(['_id'])).length;
 
       this.midia = {
         results,
@@ -224,7 +227,7 @@ module.exports = class Midia {
     const endIndex = page * pageLimit;
 
     try {
-      const results = await MidiaModel.find({ packId })
+      const results = await MidiaModel.find({ packId, status: 'published' })
         .select([
           '_id',
           'title',
@@ -277,7 +280,7 @@ module.exports = class Midia {
     const endIndex = page * pageLimit;
 
     try {
-      const results = await MidiaModel.find({ packId: [], userId })
+      const results = await MidiaModel.find({ packId: [], userId, status: 'published' })
         .select([
           '_id',
           'title',
@@ -330,7 +333,7 @@ module.exports = class Midia {
     const endIndex = page * pageLimit;
 
     try {
-      const results = await MidiaModel.find({ midiaType })
+      const results = await MidiaModel.find({ midiaType, status: 'published' })
         .select([
           '_id',
           'title',
@@ -439,7 +442,7 @@ module.exports = class Midia {
 
     try {
       // const results = await MidiaModel.find({ createIn: { $gte: startDate, $lte: endDate } })
-      const results = await MidiaModel.find()
+      const results = await MidiaModel.find({ status: 'published' })
         .select([
           '_id',
           'title',
@@ -555,6 +558,7 @@ module.exports = class Midia {
           { title: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
           { tags: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
         ],
+        status: 'published',
       })
         .select([
           '_id',
@@ -616,6 +620,7 @@ module.exports = class Midia {
       const results = await MidiaModel.find({
         $or: arrayRegex,
         midiaType: midiaType ? midiaType : { $exists: true },
+        status: 'published',
       })
         .select([
           '_id',
@@ -849,7 +854,7 @@ module.exports = class Midia {
 
   async deleteAllMidia(userId) {
     try {
-      this.midia = await MidiaModel.find({ userId }).select(['_id', 'path']);
+      this.midia = await MidiaModel.find({ userId, status: 'published' }).select(['_id', 'path']);
 
       if (!this.midia.length) {
         this.errors.push({
@@ -921,6 +926,7 @@ module.exports = class Midia {
           { title: { $regex: new RegExp(`${this.escapedStrint(search_query)}?`, 'i') } },
           // { tags: { $regex: new RegExp(`${search_query}?`, 'i') } },
         ],
+        status: 'published',
       })
         .select(['title'])
         .limit(10);
@@ -975,7 +981,7 @@ module.exports = class Midia {
 
   async getAllMidiaUserIdLength(userId) {
     try {
-      const results = await MidiaModel.find({ userId }).select(['_id']);
+      const results = await MidiaModel.find({ userId, status: 'published' }).select(['_id']);
 
       const total = results.length;
 
@@ -1004,7 +1010,11 @@ module.exports = class Midia {
       const results = [];
       for (const regex of arrayRegex) {
         const newRegex = Object.entries(regex).map(([key, value]) => ({ [key]: value }));
-        const result = await MidiaModel.findOne({ midiaType: 'img', ...newRegex[0] })
+        const result = await MidiaModel.findOne({
+          midiaType: 'img',
+          ...newRegex[0],
+          status: 'published',
+        })
           .select(['_id', 'title', 'width', 'height', 'url'])
           .sort(this.orderBy('popular'));
 
@@ -1022,6 +1032,89 @@ module.exports = class Midia {
 
       this.midia = { results };
       return this.midia;
+    } catch {
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async updateMidia() {
+    try {
+      // await MidiaModel.find().updateMany({ status: 'published' });
+
+      return;
+    } catch {
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async getAllMidiaPending(page) {
+    const pageLimit = 30;
+    const startIndex = (page - 1) * pageLimit;
+    const endIndex = page * pageLimit;
+
+    try {
+      const total = await MidiaModel.find({
+        status: 'pending',
+      }).select(['_id']);
+
+      const results = await MidiaModel.find({
+        status: 'pending',
+      }) // tras os resultados em ordem crescente com sort 1
+        .select([
+          '_id',
+          'title',
+          'description',
+          'userId',
+          'url',
+          'thumb',
+          'duration',
+          'midiaType',
+          'likes',
+          'height',
+          'width',
+          'status',
+          'createIn',
+        ])
+        .skip(startIndex) // o método skit() vai ignorar um numero de documentos da página anterior
+        .limit(pageLimit)
+        .populate({
+          path: 'userId',
+          select: ['_id', 'username', 'email', 'profilePhoto'],
+          populate: { path: 'profilePhoto', select: ['_id', 'url'] },
+        })
+        .sort(this.orderBy('asc'));
+
+      this.midia = {
+        results,
+        currentPage: page,
+        totalPages: Math.ceil(total.length / pageLimit),
+        totalResults: total.length,
+      };
+
+      return this.midia;
+    } catch (err) {
+      console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async acceptMidiaPending(midiaId) {
+    try {
+      await MidiaModel.findByIdAndUpdate(midiaId, { status: 'published' }, { new: true });
+
+      return;
     } catch {
       this.errors.push({
         type: 'server',

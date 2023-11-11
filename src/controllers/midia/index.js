@@ -104,6 +104,8 @@ class MidiaController {
         height: midiaType === 'video' ? videoHeight : imgHeight,
         duration: midiaType === 'video' ? videoDuration : '',
       };
+      let status = 'pending';
+      if (req.isAdmin) status = 'published';
 
       const body = {
         title,
@@ -114,6 +116,7 @@ class MidiaController {
         path,
         url,
         thumb,
+        status,
         ...dimensionsMidia,
       };
 
@@ -364,6 +367,8 @@ class MidiaController {
 
   async delete(req, res) {
     let midiaDelete = req.query.midiaDelete;
+    const sendEmail = req.query.sendEmail;
+
     if (!midiaDelete) return res.send();
     try {
       midiaDelete = JSON.parse(midiaDelete);
@@ -384,6 +389,10 @@ class MidiaController {
         .status(midia.errors[0].code)
         .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
       return;
+    }
+
+    if (sendEmail) {
+      // enviar email aqui para avisar ao dono user da publicação que não foi aceita
     }
 
     res.json({
@@ -483,6 +492,59 @@ class MidiaController {
     }
 
     res.json({ midia: midiaInfo });
+  }
+
+  async updateMidia(req, res) {
+    const midia = new Midia();
+
+    await midia.updateMidia();
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ success: 'update midia' });
+  }
+
+  async indexAllMidiaPending(req, res) {
+    const page = parseInt(req.query.page) || 1;
+
+    const midia = new Midia();
+
+    const midiaInfo = await midia.getAllMidiaPending(page);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ midia: midiaInfo });
+  }
+
+  async acceptMidiaPending(req, res) {
+    const { midiaId } = req.params;
+
+    const midia = new Midia();
+
+    await midia.acceptMidiaPending(midiaId);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    // enviar email aqui para avisar ao dono user da publicação que ela foi aceita
+
+    res.json({
+      success: 'Publicação aceita.',
+    });
   }
 }
 
