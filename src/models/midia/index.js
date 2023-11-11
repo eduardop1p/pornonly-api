@@ -1,5 +1,4 @@
 const { Schema, model, Types } = require('mongoose');
-const mongoose = require('mongoose');
 const { rm } = require('fs/promises');
 const { resolve } = require('path');
 const unorm = require('unorm');
@@ -86,6 +85,7 @@ module.exports = class Midia {
           'likes',
           'height',
           'width',
+          'status',
           'createIn',
         ])
         .sort(this.orderBy(order))
@@ -241,6 +241,7 @@ module.exports = class Midia {
           'url',
           'thumb',
           'duration',
+          'status',
           'createIn',
         ])
         .populate({
@@ -294,6 +295,7 @@ module.exports = class Midia {
           'url',
           'thumb',
           'duration',
+          'status',
           'createIn',
         ])
         .populate({
@@ -347,6 +349,7 @@ module.exports = class Midia {
           'likes',
           'height',
           'width',
+          'status',
           'createIn',
         ])
         .populate({
@@ -455,6 +458,7 @@ module.exports = class Midia {
           'url',
           'thumb',
           'duration',
+          'status',
           'createIn',
         ])
         .populate({
@@ -572,6 +576,7 @@ module.exports = class Midia {
           'url',
           'thumb',
           'duration',
+          'status',
           'createIn',
         ])
         .populate({
@@ -634,6 +639,7 @@ module.exports = class Midia {
           'url',
           'thumb',
           'duration',
+          'status',
           'createIn',
         ])
         .populate({
@@ -1014,8 +1020,11 @@ module.exports = class Midia {
           midiaType: 'img',
           ...newRegex[0],
           status: 'published',
+          $nor: results.length
+            ? results.map(val => ({ _id: val._id }))
+            : [{ _id: Types.ObjectId.createFromTime(1) }],
         })
-          .select(['_id', 'title', 'width', 'height', 'url'])
+          .select(['_id', 'title', 'width', 'height', 'status', 'url'])
           .sort(this.orderBy('popular'));
 
         results.push({
@@ -1032,7 +1041,8 @@ module.exports = class Midia {
 
       this.midia = { results };
       return this.midia;
-    } catch {
+    } catch (err) {
+      console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,
