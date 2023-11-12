@@ -41,6 +41,7 @@ module.exports = class Saves {
             'userId',
             'thumb',
             'duration',
+            'status',
             'createIn',
           ],
           match: { midiaType: midiaType ? midiaType : { $exists: true } },
