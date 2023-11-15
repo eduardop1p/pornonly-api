@@ -10,6 +10,7 @@ const { SavesModel } = require('../../models/saves');
 
 const MidiaSchema = new Schema({
   title: { type: String, required: false, text: true, default: 'Nenhum titulo aqui.' },
+  author: { type: String, required: false, default: '' },
   description: { type: String, default: 'Nenhum descrição para este titulo.' },
   midiaType: { type: String, require: true },
   width: { type: String, require: true },
@@ -560,6 +561,7 @@ module.exports = class Midia {
       const results = await MidiaModel.find({
         $or: [
           { title: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
+          { author: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
           { tags: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
         ],
         status: 'published',

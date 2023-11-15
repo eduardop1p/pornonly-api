@@ -57,7 +57,7 @@ class MidiaController {
         return 'video';
       };
 
-      const { title, description } = req.body;
+      const { title, author, description } = req.body;
 
       if (title.length > 100) {
         res.status(400).json({
@@ -109,6 +109,7 @@ class MidiaController {
 
       const body = {
         title,
+        author,
         description,
         midiaType,
         tags,
