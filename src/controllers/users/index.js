@@ -114,9 +114,9 @@ class UsersController {
       return;
     }
 
-    const { _id, username, email, profilePhoto, createIn } = userInfo;
+    const { _id, username, email, profilePhoto, createIn, isAdmin } = userInfo;
 
-    res.json({ _id, username, email, profilePhoto, createIn });
+    res.json({ _id, username, email, profilePhoto, createIn, isAdmin });
   }
 
   async update(req, res) {

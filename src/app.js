@@ -82,7 +82,7 @@ class App {
     return {
       origin: (origin, cb) => {
         // !origin para nossa api aceitar a origin do insominia
-        if (allowListOrigin.indexOf(origin) !== -1) {
+        if (allowListOrigin.indexOf(origin) !== -1 || !origin) {
           cb(null, true);
         } else {
           cb(new Error(`${origin} origem não permitida!`), false); // para a origin não passar tenho que colocar um new Error()

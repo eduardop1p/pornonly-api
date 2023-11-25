@@ -94,7 +94,7 @@ module.exports = class Midia {
         .limit(pageLimit)
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'email', 'profilePhoto'],
+          select: ['_id', 'username', 'email', 'profilePhoto', 'isAdmin'],
           populate: { path: 'profilePhoto', select: ['_id', 'url'] },
         });
 
@@ -247,7 +247,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -301,7 +301,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -355,7 +355,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -464,7 +464,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -583,7 +583,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -646,7 +646,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -755,7 +755,7 @@ module.exports = class Midia {
         ])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto', 'midia', 'saves'],
+          select: ['_id', 'username', 'profilePhoto', 'midia', 'saves', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -1099,7 +1099,7 @@ module.exports = class Midia {
         .limit(pageLimit)
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'email', 'profilePhoto'],
+          select: ['_id', 'username', 'email', 'profilePhoto', 'isAdmin'],
           populate: { path: 'profilePhoto', select: ['_id', 'url'] },
         })
         .sort(this.orderBy('asc'));

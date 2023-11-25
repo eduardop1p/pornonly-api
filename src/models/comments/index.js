@@ -43,7 +43,7 @@ module.exports = class Comments {
         .select(['_id', 'comment', 'likes', 'responses', 'userId', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -55,7 +55,7 @@ module.exports = class Comments {
           options: { sort: { createIn: 1 } },
           populate: {
             path: 'userId',
-            select: ['_id', 'username', 'profilePhoto'],
+            select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
             populate: {
               path: 'profilePhoto',
               select: ['_id', 'url'],
@@ -143,7 +143,7 @@ module.exports = class Comments {
         .select(['_id', 'comment', 'likes', 'responses', 'userId', 'createIn'])
         .populate({
           path: 'userId',
-          select: ['_id', 'username', 'profilePhoto'],
+          select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
           populate: {
             path: 'profilePhoto',
             select: ['_id', 'url'],
@@ -155,7 +155,7 @@ module.exports = class Comments {
           options: { sort: { createIn: 1 } },
           populate: {
             path: 'userId',
-            select: ['_id', 'username', 'profilePhoto'],
+            select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
             populate: {
               path: 'profilePhoto',
               select: ['_id', 'url'],

@@ -80,7 +80,7 @@ module.exports = class Users {
   async showUserId(userId) {
     try {
       this.user = await UsersModel.findById(userId)
-        .select(['_id', 'username', 'email', 'profilePhoto', 'saves'])
+        .select(['_id', 'username', 'email', 'profilePhoto', 'saves', 'isAdmin'])
         .populate({
           path: 'profilePhoto',
           select: ['_id', 'url', 'userId'],
@@ -112,7 +112,7 @@ module.exports = class Users {
 
     try {
       this.user = await UsersModel.findOne({ username: usernameparam })
-        .select(['_id', 'username', 'email', 'profilePhoto', 'createIn'])
+        .select(['_id', 'username', 'email', 'profilePhoto', 'createIn', 'isAdmin'])
         .populate({
           path: 'profilePhoto',
           select: ['_id', 'url', 'userId'],

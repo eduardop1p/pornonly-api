@@ -47,7 +47,7 @@ module.exports = class Saves {
           match: { midiaType: midiaType ? midiaType : { $exists: true } },
           populate: {
             path: 'userId',
-            select: ['_id', 'username', 'profilePhoto'],
+            select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
             populate: {
               path: 'profilePhoto',
               select: ['_id', 'url'],
