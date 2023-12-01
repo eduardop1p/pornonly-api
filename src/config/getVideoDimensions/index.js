@@ -17,8 +17,12 @@ function videoDurationHydration(duration) {
 
 module.exports = async function getVideoDimensions(videoUrl) {
   // atenção! este comando não irar funcionar se o caminho do terminal estiver com caracteris não aceitos, por exemplo espaçamentos
-  const commandDimensions = `${ffprobePath} -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "${videoUrl}"`;
-  const commandDuration = `${ffprobePath} -v error -select_streams v:0 -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoUrl}"`;
+  // o ffprobePath não está funcionando no linux por enquanto
+  // const commandDimensions = `${ffprobePath} -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "${videoUrl}"`;
+  // const commandDuration = `${ffprobePath} -v error -select_streams v:0 -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoUrl}"`;
+
+  const commandDimensions = `ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "${videoUrl}"`;
+  const commandDuration = `ffprobe -v error -select_streams v:0 -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoUrl}"`;
 
   try {
     const { stdout } = await promisifiedExec(commandDimensions);
@@ -35,7 +39,6 @@ module.exports = async function getVideoDimensions(videoUrl) {
       err: null,
     };
   } catch (error) {
-    console.log(error);
     return {
       width: null,
       height: null,
