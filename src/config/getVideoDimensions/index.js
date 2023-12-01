@@ -35,6 +35,7 @@ module.exports = async function getVideoDimensions(videoUrl) {
       err: null,
     };
   } catch (error) {
+    console.log(error);
     return {
       width: null,
       height: null,

@@ -78,7 +78,7 @@ class App {
 
   corsOptions() {
     const allowListOrigin = [
-      'http://localhost:3000',
+      'http://localhost:3001',
       'https://policy.pornonly.xyz',
       'https://pornonly.xyz',
     ];
