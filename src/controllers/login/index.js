@@ -35,9 +35,8 @@ class LoginController {
       maxAge: 31557600000, // esse cookie vai expirar em 1 ano
       secure: true,
       sameSite: 'None',
-      priority: 'High',
-      domain: 'pornonly.xyz',
-      signed: true,
+      // priority: 'High',
+      // domain: 'pornonly.xyz',
       // maxAge: new Date(Date.now() + 864000000)
     });
 
