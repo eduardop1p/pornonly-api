@@ -36,7 +36,7 @@ class LoginController {
       secure: true,
       sameSite: 'None',
       priority: 'High',
-      // domain: 'localhost:3000',
+      domain: 'pornonly.xyz',
       // maxAge: new Date(Date.now() + 864000000)
     });
 
