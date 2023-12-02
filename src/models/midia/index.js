@@ -183,7 +183,10 @@ module.exports = class Midia {
     try {
       const results = await MidiaModel.find({
         userId,
-        midiaType: midiaType ? midiaType : { $exists: true },
+        midiaType:
+          midiaType !== 'undefined' && typeof midiaType !== 'undefined'
+            ? midiaType
+            : { $exists: true },
       })
         .select([
           '_id',

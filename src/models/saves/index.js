@@ -44,7 +44,12 @@ module.exports = class Saves {
             'status',
             'createIn',
           ],
-          match: { midiaType: midiaType ? midiaType : { $exists: true } },
+          match: {
+            midiaType:
+              midiaType !== 'undefined' && typeof midiaType !== 'undefined'
+                ? midiaType
+                : { $exists: true },
+          },
           populate: {
             path: 'userId',
             select: ['_id', 'username', 'profilePhoto', 'isAdmin'],
