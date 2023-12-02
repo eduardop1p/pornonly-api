@@ -929,17 +929,44 @@ module.exports = class Midia {
 
   async showAllMidiaTitles(search_query) {
     try {
-      const results = await MidiaModel.find({
-        $or: [
-          { title: { $regex: new RegExp(`${this.escapedStrint(search_query)}?`, 'i') } },
-          // { tags: { $regex: new RegExp(`${search_query}?`, 'i') } },
-        ],
-        status: 'published',
-      })
-        .select(['title'])
-        .limit(10);
-
+      const results = MidiaModel.aggregate([
+        {
+          $match: {
+            title: {
+              $regex: new RegExp(`${this.escapedStrint(search_query)}?`, 'i'),
+            },
+            status: 'published',
+          },
+        },
+        {
+          $group: {
+            _id: '$title',
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            title: '$_id',
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]);
       return results;
+
+      // const results = await MidiaModel.find({
+      //   $or: [
+      //     { title: { $regex: new RegExp(`${this.escapedStrint(search_query)}?`, 'i') } },
+      //     // { tags: { $regex: new RegExp(`${search_query}?`, 'i') } },
+      //   ],
+      //   status: 'published',
+      // })
+      //   .select(['title'])
+      //   .limit(10);
+
+      // return results;
     } catch (err) {
       console.log(err);
       this.errors.push({
