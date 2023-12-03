@@ -59,7 +59,7 @@ class MidiaController {
 
       const { title, author, description } = req.body;
 
-      if (title.length > 100) {
+      if (title.length > 100 && !req.isAdmin) {
         res.status(400).json({
           type: 'title',
           error: 'Titulo muito grande, tente um titulo com menos de 100 caracteres.',
