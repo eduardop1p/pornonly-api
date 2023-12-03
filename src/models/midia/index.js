@@ -1080,7 +1080,6 @@ module.exports = class Midia {
           .sort(this.orderBy('popular'));
 
         try {
-          if (!result._id) continue;
           results.push({
             _id: result._id,
             title: result.title,
