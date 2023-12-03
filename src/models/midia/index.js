@@ -1,4 +1,4 @@
-const { Schema, model, Types } = require('mongoose');
+const { Schema, model, Types, models } = require('mongoose');
 const { rm } = require('fs/promises');
 const { resolve } = require('path');
 const unorm = require('unorm');
@@ -27,6 +27,7 @@ const MidiaSchema = new Schema({
   thumb: { type: String, require: false },
   duration: { type: String, require: false },
   status: { type: String, require: true, default: 'pending' },
+  rank: { type: Number, require: true, default: 0 },
   createIn: { type: Date, default: Date.now },
 });
 
@@ -55,7 +56,7 @@ module.exports = class Midia {
   }
 
   orderBy(order) {
-    if (order === 'popular') return { likes: -1, createIn: -1 };
+    if (order === 'popular') return { likes: -1, rank: -1, createIn: -1 };
     if (order === 'desc') return { createIn: -1 };
     if (order === 'asc') return { createIn: 1 };
 
@@ -860,6 +861,20 @@ module.exports = class Midia {
       );
       await this.user.save();
       await SavesModel.deleteMany({ midia: { $in: midiaDeleteIds } });
+      const comments = await models.Comments.find({ midiaId: { $in: midiaDeleteIds } }).select([
+        '_id',
+        'responses',
+      ]);
+      const commentIds = comments.map(val => `${val._id.toString()}`);
+      const responseIds = comments
+        .map(valCom => valCom.responses.map(valRes => valRes.toString()))
+        .flat();
+      await models.Comments.deleteMany({
+        _id: { $in: commentIds },
+      });
+      await models.ResponsesComments.deleteMany({
+        _id: { $in: responseIds },
+      });
 
       try {
         await deleteObjectS3(midiaDeletePaths);
@@ -1186,6 +1201,31 @@ module.exports = class Midia {
         type: 'server',
         code: 500,
         msg: 'Erro interno no servidor.',
+      });
+    }
+  }
+
+  async storeRank(midiaId) {
+    try {
+      this.midia = await MidiaModel.findById(midiaId);
+
+      if (!this.midia) {
+        this.errors.push({
+          type: 'server',
+          code: 500,
+          msg: 'Pin não encontrado',
+        });
+        return;
+      }
+      this.midia.rank = parseInt(this.midia.rank + 1);
+      await this.midia.save();
+      return;
+    } catch (err) {
+      console.log(err);
+      this.errors.push({
+        type: 'server',
+        code: 500,
+        msg: 'Erro interno no servidor',
       });
     }
   }

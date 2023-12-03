@@ -178,7 +178,8 @@ module.exports = class Comments {
       };
 
       return this.comment;
-    } catch {
+    } catch (err) {
+      // console.log(err);
       this.errors.push({
         type: 'server',
         code: 500,

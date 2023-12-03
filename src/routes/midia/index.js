@@ -18,6 +18,8 @@ router.get('/get-all-midia-titles', midiaController.showMidiaTitles);
 router.get('/get-all-midia-tags', midiaController.showMidiaTags);
 router.get('/get-all-midia-tags-category', midiaController.indexMidiaTagsCategory);
 router.get('/get-all-midia-userId-length/:userId', midiaController.indexAllMidiaUserIdLength);
+router.get('/get-all-midia-userId-length/:userId', midiaController.indexAllMidiaUserIdLength);
+router.get('/rank/:midiaId', midiaController.storeMidiaRank);
 // router.get('/update-midia', midiaController.updateMidia);
 
 router.get('/get-all-midia-packsnoid', loginRequired, midiaController.indexAllMidiaPackNoId);

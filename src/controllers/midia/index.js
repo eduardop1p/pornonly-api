@@ -347,10 +347,10 @@ class MidiaController {
     const midiaType = req.query.midiaType;
     const order = req.query.order;
 
-    if (searchTags.length > 5) {
-      res.status(400).json({ type: 'tags', error: 'Tente uma pesquisa com menos de 5 tags.' });
-      return;
-    }
+    // if (searchTags.length > 5) {
+    //   res.status(400).json({ type: 'tags', error: 'Tente uma pesquisa com menos de 5 tags.' });
+    //   return;
+    // }
 
     const midia = new Midia();
 
@@ -373,7 +373,7 @@ class MidiaController {
     if (!midiaDelete) return res.send();
     try {
       midiaDelete = JSON.parse(midiaDelete);
-    } catch {
+    } catch (err) {
       return res.status(500).json({
         type: 'server',
         error: 'Erro ao processar resposta',
@@ -546,6 +546,26 @@ class MidiaController {
     res.json({
       success: 'Publicação aceita.',
     });
+  }
+
+  async storeMidiaRank(req, res) {
+    const { midiaId } = req.params;
+
+    if (!midiaId) {
+      return res.status(500).json({ type: 'server', error: 'Erro ao processar requisição' });
+    }
+
+    const midia = new Midia();
+    await midia.storeRank(midiaId);
+
+    if (midia.errors.length) {
+      res
+        .status(midia.errors[0].code)
+        .json({ type: midia.errors[0].type, error: midia.errors[0].msg });
+      return;
+    }
+
+    res.json({ success: 'Rank adcionado' });
   }
 }
 
