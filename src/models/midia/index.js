@@ -9,7 +9,7 @@ const deleteObjectS3 = require('../../services/deleteObjectS3');
 const { SavesModel } = require('../../models/saves');
 
 const MidiaSchema = new Schema({
-  title: { type: String, required: false, text: true, default: 'Nenhum titulo aqui.' },
+  title: { type: String, required: false, text: true, default: '' },
   author: { type: String, required: false, default: '' },
   description: { type: String, default: 'Nenhum descrição para este titulo.' },
   midiaType: { type: String, require: true },
