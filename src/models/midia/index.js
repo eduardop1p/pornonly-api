@@ -55,7 +55,7 @@ module.exports = class Midia {
   }
 
   orderBy(order) {
-    if (order === 'popular') return { likes: -1 };
+    if (order === 'popular') return { likes: -1, createIn: -1 };
     if (order === 'desc') return { createIn: -1 };
     if (order === 'asc') return { createIn: 1 };
 
@@ -71,7 +71,10 @@ module.exports = class Midia {
       const total = await MidiaModel.countDocuments();
 
       const results = await MidiaModel.find({
-        midiaType: midiaType ? midiaType : { $exists: true },
+        midiaType:
+          midiaType !== 'undefined' && typeof midiaType !== 'undefined'
+            ? midiaType
+            : { $exists: true },
         status: 'published',
       }) // tras os resultados em ordem crescente com sort 1
         .select([
@@ -415,13 +418,13 @@ module.exports = class Midia {
       // ]);
 
       // const results = resultsDb.sort(() => Math.random() - 0.5);
-      const total = results.length;
+      const total = await MidiaModel.find({ midiaType, status: 'published' }).select(['_id']);
 
       this.midia = {
         results,
         currentPage: page,
-        totalPages: Math.ceil(total / pageLimit),
-        totalResults: total,
+        totalPages: Math.ceil(total.length / pageLimit),
+        totalResults: total.length,
       };
 
       return this.midia;
@@ -477,7 +480,7 @@ module.exports = class Midia {
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      const total = results.length;
+      const total = await MidiaModel.countDocuments();
 
       this.midia = {
         results,
@@ -596,13 +599,20 @@ module.exports = class Midia {
         .limit(pageLimit)
         .sort({ createIn: -1 });
 
-      const total = results.length;
+      const total = await MidiaModel.find({
+        $or: [
+          { title: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
+          { author: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
+          { tags: { $regex: new RegExp(`${this.escapedStrint(searchQuery)}?`, 'i') } },
+        ],
+        status: 'published',
+      }).select(['_id']);
 
       this.midia = {
         results,
         currentPage: page,
-        totalPages: Math.ceil(total / pageLimit),
-        totalResults: total,
+        totalPages: Math.ceil(total.length / pageLimit),
+        totalResults: total.length,
       };
 
       return this.midia;
@@ -629,7 +639,10 @@ module.exports = class Midia {
       // const results = await MidiaModel.find({ $text: { $search: searchTags } })
       const results = await MidiaModel.find({
         $or: arrayRegex,
-        midiaType: midiaType ? midiaType : { $exists: true },
+        midiaType:
+          midiaType !== 'undefined' && typeof midiaType !== 'undefined'
+            ? midiaType
+            : { $exists: true },
         status: 'published',
       })
         .select([
@@ -718,13 +731,20 @@ module.exports = class Midia {
       // ]);
 
       // const results = resultsDb.sort(() => Math.random() - 0.5);
-      const total = results.length;
+      const total = await MidiaModel.find({
+        $or: arrayRegex,
+        midiaType:
+          midiaType !== 'undefined' && typeof midiaType !== 'undefined'
+            ? midiaType
+            : { $exists: true },
+        status: 'published',
+      }).select(['_id']);
 
       this.midia = {
         results,
         currentPage: page,
-        totalPages: Math.ceil(total / pageLimit),
-        totalResults: total,
+        totalPages: Math.ceil(total.length / pageLimit),
+        totalResults: total.length,
       };
 
       return this.midia;
