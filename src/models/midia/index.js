@@ -1079,14 +1079,18 @@ module.exports = class Midia {
           .select(['_id', 'title', 'width', 'height', 'status', 'url'])
           .sort(this.orderBy('popular'));
 
-        results.push({
-          _id: result._id,
-          title: result.title,
-          tag: regex.tagName,
-          width: result.width,
-          height: result.height,
-          url: result.url,
-        });
+        try {
+          results.push({
+            _id: result._id,
+            title: result.title,
+            tag: regex.tagName,
+            width: result.width,
+            height: result.height,
+            url: result.url,
+          });
+        } catch {
+          continue;
+        }
       }
 
       // console.log(results.map((val, index) => ({ val, tags: uniqueTagsArray[index] })));
